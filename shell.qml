@@ -1,0 +1,96 @@
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import "qml/wallpaperpicker"
+
+Scope {
+    id: shellRoot
+
+    function forEachWindow(callback) {
+        const windows = panelVariants.instances ? panelVariants.instances : [];
+        for (let index = 0; index < windows.length; index++) {
+            const window = windows[index];
+            if (window)
+                callback(window);
+        }
+    }
+
+    function forFocusedWindow(callback) {
+        const windows = panelVariants.instances ? panelVariants.instances : [];
+        let fallbackWindow = null;
+        for (let index = 0; index < windows.length; index++) {
+            const window = windows[index];
+            if (window && !fallbackWindow)
+                fallbackWindow = window;
+            if (window && window.monitorFocused) {
+                callback(window);
+                return;
+            }
+        }
+        if (fallbackWindow)
+            callback(fallbackWindow);
+    }
+
+    // quickshell ipc call tide toggle / show / hide
+    IpcHandler {
+        target: "tide"
+
+        function toggle() {
+            shellRoot.forFocusedWindow((window) => window.toggleExpanded());
+        }
+
+        function show() {
+            shellRoot.forFocusedWindow((window) => window.setExpanded(true));
+        }
+
+        function hide() {
+            shellRoot.forEachWindow((window) => window.setExpanded(false));
+        }
+
+        function player() {
+            shellRoot.forFocusedWindow((window) => window.showPlayer());
+        }
+
+        function clock() {
+            shellRoot.forFocusedWindow((window) => window.showClock());
+        }
+    }
+
+    // quickshell ipc call picker toggle / show / hide
+    IpcHandler {
+        target: "picker"
+
+        function toggle() { wallpaperPicker.toggle(); }
+        function show() { wallpaperPicker.show(); }
+        function hide() { wallpaperPicker.hide(); }
+    }
+
+    WallpaperPickerPanel {
+        id: wallpaperPicker
+    }
+
+    // Coordination: while the wallpaper picker is open, collapse every
+    // island instance so the two don't overlap or fight for focus/input.
+    Connections {
+        target: wallpaperPicker
+        function onShownChanged() {
+            shellRoot.forEachWindow((window) => {
+                window.suppressPeek = wallpaperPicker.shown;
+                if (wallpaperPicker.shown)
+                    window.setExpanded(false);
+            });
+        }
+    }
+
+    Variants {
+        id: panelVariants
+
+        model: Quickshell.screens
+
+        DynamicIslandWindow {
+            required property var modelData
+
+            screen: modelData
+        }
+    }
+}
