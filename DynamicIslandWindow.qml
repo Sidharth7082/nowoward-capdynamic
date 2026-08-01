@@ -100,7 +100,6 @@ PanelWindow {
     function showClock() { setExpanded(true); page = "clock"; notifyActivity(); }
     function showStats() { setExpanded(true); page = "stats"; notifyActivity(); }
     function showNotifs() { setExpanded(true); page = "notifs"; notifyActivity(); }
-    function showApps() { setExpanded(true); page = "apps"; notifyActivity(); }
     function showWifi() { setExpanded(true); page = "wifi"; notifyActivity(); }
     function showBluetooth() { setExpanded(true); page = "bluetooth"; notifyActivity(); }
 
@@ -130,11 +129,9 @@ PanelWindow {
                         ? Theme.statsWidth
                         : (root.page === "notifs"
                             ? 360
-                            : (root.page === "apps"
-                                ? 360
-                                : (root.page === "wifi"
-                                    ? Theme.wifiWidth
-                                    : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth))))))))
+                            : (root.page === "wifi"
+                                ? Theme.wifiWidth
+                                : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth)))))))
 
     readonly property int targetHeight: peekingNotif
         ? (root.notifExpanded ? 90 : Theme.notificationHeight)
@@ -148,11 +145,9 @@ PanelWindow {
                         ? Theme.statsHeight
                         : (root.page === "notifs"
                             ? 220
-                            : (root.page === "apps"
-                                ? 110
-                                : (root.page === "wifi"
-                                    ? Theme.wifiHeight
-                                    : (root.page === "bluetooth" ? Theme.btHeight : Theme.clockHeight))))))))
+                            : (root.page === "wifi"
+                                ? Theme.wifiHeight
+                                : (root.page === "bluetooth" ? Theme.btHeight : Theme.clockHeight)))))))
 
     color: "transparent"
     anchors { top: true; left: true; right: true }
@@ -555,18 +550,6 @@ PanelWindow {
                 anchors.fill: parent
                 opacity: root.page === "notifs" ? 1 : 0
                 scale: root.page === "notifs" ? 1 : 0.95
-                visible: opacity > 0.01
-
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-            }
-
-            // Page 5: Quick App Launcher
-            IslandAppLauncherLayer {
-                id: appsPage
-                anchors.fill: parent
-                opacity: root.page === "apps" ? 1 : 0
-                scale: root.page === "apps" ? 1 : 0.95
                 visible: opacity > 0.01
 
                 Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }

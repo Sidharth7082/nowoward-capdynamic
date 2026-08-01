@@ -161,7 +161,6 @@ Control the Dynamic Island or Wallpaper Picker from terminal scripts, waybar but
 | **Show Music Player Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island player` |
 | **Show Control Center Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island stats` |
 | **Show Notification History** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs` |
-| **Show Quick App Launcher** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island apps` |
 | **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island wifi` |
 | **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island bluetooth` |
 | **Toggle Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle` |
@@ -183,7 +182,6 @@ end)
 -- keybind.lua
 hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs"))
-hl.bind("SUPER + A", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island apps"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
 ```
 
@@ -196,7 +194,6 @@ exec-once = quickshell -p ~/.config/quickshell/nowoward-capdynamic
 # Keybindings
 bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle
 bind = SUPER, N, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs
-bind = SUPER, A, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island apps
 bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
 ```
 
