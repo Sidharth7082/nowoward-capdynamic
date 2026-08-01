@@ -215,33 +215,35 @@ Item {
                 Rectangle {
                     id: brightTrack
                     width: parent.width
-                    height: 12
-                    radius: 6
+                    height: 14
+                    radius: 7
                     color: "#222222"
                     border.color: "#33ffffff"
                     border.width: 1
 
                     Rectangle {
                         height: parent.height
-                        width: Math.max(12, parent.width * (BrightnessService.brightness / 100.0))
-                        radius: 6
+                        width: Math.max(14, parent.width * (BrightnessService.brightness / 100.0))
+                        radius: 7
                         color: "#f59e0b"
 
-                        Behavior on width { NumberAnimation { duration: 100 } }
+                        Behavior on width { NumberAnimation { duration: 80 } }
                     }
 
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onPressed: (mouse) => {
-                            let pct = (mouse.x / width) * 100;
+                        preventStealing: true
+
+                        function updateValue(mouseX) {
+                            if (mouseX < 0 || mouseX > width) return;
+                            let pct = Math.max(0, Math.min(100, Math.round((mouseX / width) * 100)));
                             BrightnessService.setBrightness(pct);
                         }
+
+                        onPressed: (mouse) => updateValue(mouse.x)
                         onPositionChanged: (mouse) => {
-                            if (pressed) {
-                                let pct = (mouse.x / width) * 100;
-                                BrightnessService.setBrightness(pct);
-                            }
+                            if (pressed) updateValue(mouse.x);
                         }
                     }
                 }
@@ -274,33 +276,35 @@ Item {
                 Rectangle {
                     id: volTrack
                     width: parent.width
-                    height: 12
-                    radius: 6
+                    height: 14
+                    radius: 7
                     color: "#222222"
                     border.color: "#33ffffff"
                     border.width: 1
 
                     Rectangle {
                         height: parent.height
-                        width: Math.max(12, parent.width * (VolumeService.volume / 100.0))
-                        radius: 6
+                        width: Math.max(14, parent.width * (VolumeService.volume / 100.0))
+                        radius: 7
                         color: Colors.accent
 
-                        Behavior on width { NumberAnimation { duration: 100 } }
+                        Behavior on width { NumberAnimation { duration: 80 } }
                     }
 
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onPressed: (mouse) => {
-                            let pct = (mouse.x / width) * 100;
+                        preventStealing: true
+
+                        function updateValue(mouseX) {
+                            if (mouseX < 0 || mouseX > width) return;
+                            let pct = Math.max(0, Math.min(100, Math.round((mouseX / width) * 100)));
                             VolumeService.setVolume(pct);
                         }
+
+                        onPressed: (mouse) => updateValue(mouse.x)
                         onPositionChanged: (mouse) => {
-                            if (pressed) {
-                                let pct = (mouse.x / width) * 100;
-                                VolumeService.setVolume(pct);
-                            }
+                            if (pressed) updateValue(mouse.x);
                         }
                     }
                 }
