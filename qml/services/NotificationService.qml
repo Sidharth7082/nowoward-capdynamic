@@ -13,6 +13,7 @@ NotificationServer {
     signal notificationAdded(var notification)
 
     property var list: []
+    property var history: []
     property var latestNotification: null
 
     onNotification: function(n) {
@@ -21,6 +22,16 @@ NotificationServer {
 
         if (root.list.includes(n)) return;
 
+        const notifItem = {
+            id: n.id || Date.now(),
+            appName: n.appName || "Notification",
+            summary: n.summary || "",
+            body: n.body || "",
+            appIcon: n.appIcon || "",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        root.history = [notifItem, ...root.history.slice(0, 19)];
         root.list = [n, ...root.list];
         root.latestNotification = n;
         root.notificationAdded(n);
@@ -30,6 +41,10 @@ NotificationServer {
             if (root.latestNotification === n)
                 root.latestNotification = null;
         });
+    }
+
+    function clearHistory() {
+        root.history = [];
     }
 
     function dismissLatest() {

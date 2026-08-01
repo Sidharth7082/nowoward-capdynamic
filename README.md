@@ -160,6 +160,8 @@ Control the Dynamic Island or Wallpaper Picker from terminal scripts, waybar but
 | **Show Clock Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island clock` |
 | **Show Music Player Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island player` |
 | **Show Control Center Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island stats` |
+| **Show Notification History** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs` |
+| **Show Quick App Launcher** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island apps` |
 | **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island wifi` |
 | **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island bluetooth` |
 | **Toggle Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle` |

@@ -70,6 +70,14 @@ Scope {
             shellRoot.forFocusedWindow((window) => window.showStats());
         }
 
+        function notifs() {
+            shellRoot.forFocusedWindow((window) => window.showNotifs());
+        }
+
+        function apps() {
+            shellRoot.forFocusedWindow((window) => window.showApps());
+        }
+
         function wifi() {
             shellRoot.forFocusedWindow((window) => window.showWifi());
         }

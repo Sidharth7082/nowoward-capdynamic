@@ -81,17 +81,31 @@ PanelWindow {
     onExpandedChanged: syncIdleTimer()
     onPeekingChanged: syncIdleTimer()
 
-    function toggleExpanded() { root.expanded = !root.expanded; }
-    function setExpanded(value) { root.expanded = value; }
-    function showPlayer() { root.page = "player"; root.expanded = true; }
-    function showClock() { root.page = "clock"; root.expanded = true; }
-    function showStats() { root.page = "stats"; root.expanded = true; }
-    function showWifi() { root.page = "wifi"; root.expanded = true; }
-    function showBluetooth() { root.page = "bluetooth"; root.expanded = true; }
+    function setExpanded(val) {
+        expanded = val;
+        if (expanded) {
+            peeking = false;
+            peekingNotif = false;
+            peekingVolume = false;
+            peekingWorkspace = false;
+            notifyActivity();
+        } else {
+            leaveTimer.stop();
+            idleTimer.stop();
+        }
+    }
+
+    function toggleExpanded() { setExpanded(!expanded); }
+    function showPlayer() { setExpanded(true); page = "player"; notifyActivity(); }
+    function showClock() { setExpanded(true); page = "clock"; notifyActivity(); }
+    function showStats() { setExpanded(true); page = "stats"; notifyActivity(); }
+    function showNotifs() { setExpanded(true); page = "notifs"; notifyActivity(); }
+    function showApps() { setExpanded(true); page = "apps"; notifyActivity(); }
+    function showWifi() { setExpanded(true); page = "wifi"; notifyActivity(); }
+    function showBluetooth() { setExpanded(true); page = "bluetooth"; notifyActivity(); }
 
     function nextPage() {
-        let idx = pages.indexOf(root.page);
-        if (idx === -1) idx = 0;
+        const idx = pages.indexOf(root.page);
         root.page = pages[(idx + 1) % pages.length];
     }
 
@@ -112,9 +126,13 @@ PanelWindow {
                     ? Theme.playerWidth
                     : (root.page === "stats"
                         ? Theme.statsWidth
-                        : (root.page === "wifi"
-                            ? Theme.wifiWidth
-                            : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth))))))
+                        : (root.page === "notifs"
+                            ? 360
+                            : (root.page === "apps"
+                                ? 360
+                                : (root.page === "wifi"
+                                    ? Theme.wifiWidth
+                                    : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth))))))))
 
     readonly property int targetHeight: peekingNotif
         ? Theme.notificationHeight
@@ -126,9 +144,13 @@ PanelWindow {
                     ? Theme.playerHeight
                     : (root.page === "stats"
                         ? Theme.statsHeight
-                        : (root.page === "wifi"
-                            ? Theme.wifiHeight
-                            : (root.page === "bluetooth" ? Theme.btHeight : Theme.clockHeight))))))
+                        : (root.page === "notifs"
+                            ? 220
+                            : (root.page === "apps"
+                                ? 110
+                                : (root.page === "wifi"
+                                    ? Theme.wifiHeight
+                                    : (root.page === "bluetooth" ? Theme.btHeight : Theme.clockHeight))))))))
 
     color: "transparent"
     anchors { top: true; left: true; right: true }
@@ -518,12 +540,35 @@ PanelWindow {
 
                 onWifiRightClicked: root.showWifi()
                 onBtRightClicked: root.showBluetooth()
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+            }
+
+            // Page 4: Notification History Center
+            IslandNotificationCenterLayer {
+                id: notifsPage
+                anchors.fill: parent
+                opacity: root.page === "notifs" ? 1 : 0
+                scale: root.page === "notifs" ? 1 : 0.92
+                visible: opacity > 0.01
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
             }
 
-            // Page 4: Wi-Fi Detail Page
+            // Page 5: Quick App Launcher
+            IslandAppLauncherLayer {
+                id: appsPage
+                anchors.fill: parent
+                opacity: root.page === "apps" ? 1 : 0
+                scale: root.page === "apps" ? 1 : 0.92
+                visible: opacity > 0.01
+
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+            }
+
+            // Page 6: Wi-Fi Detail Page
             IslandWifiLayer {
                 id: wifiPage
                 anchors.fill: parent
@@ -537,7 +582,7 @@ PanelWindow {
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
             }
 
-            // Page 5: Bluetooth Detail Page
+            // Page 7: Bluetooth Detail Page
             IslandBluetoothLayer {
                 id: btPage
                 anchors.fill: parent
