@@ -21,6 +21,6 @@ QtObject {
     readonly property int wifiHeight: 220
     readonly property int btWidth: 340
     readonly property int btHeight: 220
-    readonly property int notificationWidth: 320
-    readonly property int notificationHeight: 96
+    readonly property int notificationWidth: 240
+    readonly property int notificationHeight: 38
 }

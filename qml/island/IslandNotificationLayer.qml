@@ -7,56 +7,52 @@ Item {
     property var notification: null
     signal dismissed()
 
-    implicitWidth: 320
-    implicitHeight: 96
+    anchors.fill: parent
 
     Row {
-        id: mainRow
-        anchors.fill: parent
-        anchors.margins: 14
-        spacing: 12
+        anchors.centerIn: parent
+        spacing: 10
 
-        // Notification Icon or App badge
+        // Animated Bell Badge
         Rectangle {
-            width: 44
-            height: 44
-            radius: 22
-            color: "#2a2a2a"
-            border.color: Theme.border
-            border.width: 1
+            id: bellBadge
+            width: 24
+            height: 24
+            radius: 12
+            color: Colors.accent
             anchors.verticalCenter: parent.verticalCenter
 
             Text {
+                id: bellIcon
                 anchors.centerIn: parent
                 text: "🔔"
-                font.pixelSize: 20
+                font.pixelSize: 13
+                transformOrigin: Item.Center
+
+                SequentialAnimation {
+                    id: bellWiggle
+                    running: root.visible
+                    loops: 2
+
+                    NumberAnimation { target: bellIcon; property: "rotation"; from: 0; to: -18; duration: 80 }
+                    NumberAnimation { target: bellIcon; property: "rotation"; from: -18; to: 18; duration: 120 }
+                    NumberAnimation { target: bellIcon; property: "rotation"; from: 18; to: -10; duration: 80 }
+                    NumberAnimation { target: bellIcon; property: "rotation"; from: -10; to: 0; duration: 60 }
+                }
             }
         }
 
-        // Title and Body
-        Column {
-            width: parent.width - 56
+        // Notification Text
+        Text {
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 4
-
-            Text {
-                width: parent.width
-                text: root.notification ? (root.notification.summary || root.notification.appName || "Notification") : ""
-                color: Theme.text
-                font.pixelSize: 14
-                font.weight: Font.Bold
-                elide: Text.ElideRight
-            }
-
-            Text {
-                width: parent.width
-                text: root.notification ? (root.notification.body || "") : ""
-                color: Theme.subtext
-                font.pixelSize: 12
-                maximumLineCount: 2
-                wrapMode: Text.WordWrap
-                elide: Text.ElideRight
-            }
+            text: root.notification
+                ? ((root.notification.summary ? root.notification.summary : root.notification.appName) || "Notification")
+                : "Notification"
+            color: Theme.text
+            font.pixelSize: 13
+            font.weight: Font.DemiBold
+            elide: Text.ElideRight
+            maximumLineCount: 1
         }
     }
 }
