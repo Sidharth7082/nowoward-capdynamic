@@ -97,8 +97,8 @@ Item {
                 anchors.centerIn: parent
                 spacing: 6
                 Text {
-                    text: BluetoothService.enabled ? "● Status:" : "○ Bluetooth Power Off"
-                    color: BluetoothService.enabled ? "#10b981" : Theme.subtext
+                    text: BluetoothService.serviceActive ? (BluetoothService.enabled ? "● Status:" : "○ Power Off") : "⚠ Daemon:"
+                    color: BluetoothService.serviceActive ? (BluetoothService.enabled ? "#10b981" : Theme.subtext) : "#ef4444"
                     font.pixelSize: 11
                     font.weight: Font.DemiBold
                 }
@@ -111,7 +111,7 @@ Item {
             }
         }
 
-        // ── Bluetooth Devices List ───────────────────────────────
+        // ── Bluetooth Devices List / Service Start Prompt ────────
         Rectangle {
             width: parent.width
             height: 110
@@ -121,10 +121,12 @@ Item {
             border.width: 1
             clip: true
 
+            // When service is active
             ListView {
                 anchors.fill: parent
                 anchors.margins: 4
                 spacing: 4
+                visible: BluetoothService.serviceActive
                 model: BluetoothService.deviceList
 
                 delegate: Rectangle {
@@ -165,6 +167,42 @@ Item {
                     text: BluetoothService.enabled ? "Scanning nearby Bluetooth devices..." : "Turn on Bluetooth to view devices"
                     color: Theme.subtext
                     font.pixelSize: 11
+                }
+            }
+
+            // When service is inactive / dead
+            Column {
+                anchors.centerIn: parent
+                spacing: 8
+                visible: !BluetoothService.serviceActive
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Bluetooth Service (BlueZ) is stopped"
+                    color: "#ef4444"
+                    font.pixelSize: 11
+                    font.weight: Font.Bold
+                }
+
+                Rectangle {
+                    width: 160
+                    height: 26
+                    radius: 6
+                    color: "#2563eb"
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 4
+                        Text { text: "⚡"; color: "white"; font.pixelSize: 11 }
+                        Text { text: "Start Bluetooth Daemon"; color: "white"; font.pixelSize: 10; font.weight: Font.Bold }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: BluetoothService.startService()
+                    }
                 }
             }
         }
