@@ -82,6 +82,7 @@ QtObject {
             }
         }
 
+        root.deviceList = [];
         root.deviceList = results;
     }
 

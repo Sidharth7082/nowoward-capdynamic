@@ -9,6 +9,11 @@ Item {
 
     anchors.fill: parent
 
+    Component.onCompleted: NetworkService.scanNetworks()
+    onVisibleChanged: {
+        if (visible) NetworkService.scanNetworks();
+    }
+
     Column {
         anchors.fill: parent
         anchors.margins: 12

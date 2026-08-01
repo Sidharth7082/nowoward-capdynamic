@@ -33,7 +33,7 @@ QtObject {
     }
 
     property var _procScan: Process {
-        command: ["sh", "-c", "nmcli -t -f IN-USE,SSID,SIGNAL,SECURITY dev wifi 2>/dev/null | grep -v '^:' || echo ''"]
+        command: ["sh", "-c", "nmcli -t -f IN-USE,SSID,SIGNAL,SECURITY dev wifi list 2>/dev/null"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: (text) => {
@@ -82,7 +82,7 @@ QtObject {
             if (!line) continue;
             const parts = line.split(":");
             if (parts.length >= 3) {
-                const inUse = parts[0] === "*";
+                const inUse = parts[0].trim() === "*";
                 const netSsid = parts[1].trim();
                 const signal = parseInt(parts[2]) || 0;
                 const sec = parts.length >= 4 ? parts[3].trim() : "Open";
@@ -99,6 +99,7 @@ QtObject {
             }
         }
 
+        root.networkList = [];
         root.networkList = results;
     }
 

@@ -9,6 +9,11 @@ Item {
 
     anchors.fill: parent
 
+    Component.onCompleted: BluetoothService.scanDevices()
+    onVisibleChanged: {
+        if (visible) BluetoothService.scanDevices();
+    }
+
     Column {
         anchors.fill: parent
         anchors.margins: 12
