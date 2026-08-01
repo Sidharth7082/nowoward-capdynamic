@@ -26,6 +26,11 @@ QtObject {
         running: false
     }
 
+    property var _procSettings: Process {
+        command: []
+        running: false
+    }
+
     function toggleBluetooth() {
         const nextState = root.enabled ? "power off" : "power on";
         root.enabled = !root.enabled;
@@ -33,6 +38,12 @@ QtObject {
         root._procToggle.command = ["sh", "-c", "bluetoothctl " + nextState];
         root._procToggle.running = false;
         root._procToggle.running = true;
+    }
+
+    function openSettings() {
+        root._procSettings.command = ["sh", "-c", "blueman-manager 2>/dev/null || gnome-control-center bluetooth 2>/dev/null || kitty -e bluetoothctl 2>/dev/null || bluetoothctl"];
+        root._procSettings.running = false;
+        root._procSettings.running = true;
     }
 
     property var _timer: Timer {

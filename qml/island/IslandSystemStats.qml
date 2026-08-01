@@ -12,19 +12,25 @@ Item {
         width: parent.width - 24
         spacing: 10
 
-        // ── 1. Top Row: Wi-Fi & Bluetooth Toggle Pills ───────────
+        // ── 1. Top Row: Wi-Fi & Bluetooth Dynamic Pill Tiles ─────
         Row {
             width: parent.width
             spacing: 10
 
-            // Wi-Fi Pill
+            // Wi-Fi Pill Tile
             Rectangle {
+                id: wifiTile
                 width: (parent.width - 10) / 2
-                height: 48
+                height: 50
                 radius: 14
-                color: NetworkService.enabled ? "#253852" : "#202020"
-                border.color: NetworkService.enabled ? "#4f83cc" : Theme.border
+                color: NetworkService.enabled ? "#1e3a8a" : "#181818"
+                border.color: NetworkService.enabled ? "#3b82f6" : "#282828"
                 border.width: 1
+
+                scale: wifiArea.pressed ? 0.96 : (wifiArea.containsMouse ? 1.02 : 1.0)
+                Behavior on scale { NumberAnimation { duration: 120 } }
+                Behavior on color { ColorAnimation { duration: 200 } }
+                Behavior on border.color { ColorAnimation { duration: 200 } }
 
                 Row {
                     anchors.fill: parent
@@ -32,34 +38,43 @@ Item {
                     spacing: 8
 
                     Rectangle {
-                        width: 32
-                        height: 32
+                        width: 34
+                        height: 34
                         radius: 10
-                        color: NetworkService.enabled ? Colors.accent : "#333333"
+                        color: NetworkService.enabled ? "#2563eb" : "#2a2a2a"
                         anchors.verticalCenter: parent.verticalCenter
+                        Behavior on color { ColorAnimation { duration: 200 } }
 
                         Text {
                             anchors.centerIn: parent
                             text: "📶"
-                            font.pixelSize: 14
+                            font.pixelSize: 15
                         }
                     }
 
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - 48
+                        width: parent.width - 50
                         spacing: 1
 
-                        Text {
-                            text: "Wi-Fi"
-                            color: Theme.text
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
+                        Row {
+                            spacing: 4
+                            Text {
+                                text: "Wi-Fi"
+                                color: Theme.text
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                            }
+                            Text {
+                                text: NetworkService.enabled ? "🟢" : "⚪"
+                                font.pixelSize: 8
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
                         Text {
                             width: parent.width
                             text: NetworkService.ssid
-                            color: Theme.subtext
+                            color: NetworkService.enabled ? "#93c5fd" : Theme.subtext
                             font.pixelSize: 10
                             elide: Text.ElideRight
                         }
@@ -67,20 +82,36 @@ Item {
                 }
 
                 MouseArea {
+                    id: wifiArea
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: NetworkService.toggleWifi()
+                    hoverEnabled: true
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                    onClicked: (mouse) => {
+                        if (mouse.button === Qt.LeftButton) {
+                            NetworkService.toggleWifi();
+                        } else if (mouse.button === Qt.RightButton) {
+                            NetworkService.openSettings();
+                        }
+                    }
                 }
             }
 
-            // Bluetooth Pill
+            // Bluetooth Pill Tile
             Rectangle {
+                id: btTile
                 width: (parent.width - 10) / 2
-                height: 48
+                height: 50
                 radius: 14
-                color: BluetoothService.enabled ? "#253852" : "#202020"
-                border.color: BluetoothService.enabled ? "#4f83cc" : Theme.border
+                color: BluetoothService.enabled ? "#311b92" : "#181818"
+                border.color: BluetoothService.enabled ? "#8b5cf6" : "#282828"
                 border.width: 1
+
+                scale: btArea.pressed ? 0.96 : (btArea.containsMouse ? 1.02 : 1.0)
+                Behavior on scale { NumberAnimation { duration: 120 } }
+                Behavior on color { ColorAnimation { duration: 200 } }
+                Behavior on border.color { ColorAnimation { duration: 200 } }
 
                 Row {
                     anchors.fill: parent
@@ -88,34 +119,43 @@ Item {
                     spacing: 8
 
                     Rectangle {
-                        width: 32
-                        height: 32
+                        width: 34
+                        height: 34
                         radius: 10
-                        color: BluetoothService.enabled ? Colors.accent : "#333333"
+                        color: BluetoothService.enabled ? "#7c3aed" : "#2a2a2a"
                         anchors.verticalCenter: parent.verticalCenter
+                        Behavior on color { ColorAnimation { duration: 200 } }
 
                         Text {
                             anchors.centerIn: parent
                             text: "🔵"
-                            font.pixelSize: 14
+                            font.pixelSize: 15
                         }
                     }
 
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - 48
+                        width: parent.width - 50
                         spacing: 1
 
-                        Text {
-                            text: "Bluetooth"
-                            color: Theme.text
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
+                        Row {
+                            spacing: 4
+                            Text {
+                                text: "Bluetooth"
+                                color: Theme.text
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                            }
+                            Text {
+                                text: BluetoothService.enabled ? "🟢" : "⚪"
+                                font.pixelSize: 8
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
                         Text {
                             width: parent.width
                             text: BluetoothService.statusText
-                            color: Theme.subtext
+                            color: BluetoothService.enabled ? "#c4b5fd" : Theme.subtext
                             font.pixelSize: 10
                             elide: Text.ElideRight
                         }
@@ -123,9 +163,19 @@ Item {
                 }
 
                 MouseArea {
+                    id: btArea
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: BluetoothService.toggleBluetooth()
+                    hoverEnabled: true
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                    onClicked: (mouse) => {
+                        if (mouse.button === Qt.LeftButton) {
+                            BluetoothService.toggleBluetooth();
+                        } else if (mouse.button === Qt.RightButton) {
+                            BluetoothService.openSettings();
+                        }
+                    }
                 }
             }
         }
@@ -264,7 +314,7 @@ Item {
                 width: (parent.width - 12) / 3
                 height: 28
                 radius: 8
-                color: "#1d1d1d"
+                color: "#181818"
                 border.color: Theme.border
                 border.width: 1
 
@@ -286,7 +336,7 @@ Item {
                 width: (parent.width - 12) / 3
                 height: 28
                 radius: 8
-                color: "#1d1d1d"
+                color: "#181818"
                 border.color: Theme.border
                 border.width: 1
 
@@ -308,7 +358,7 @@ Item {
                 width: (parent.width - 12) / 3
                 height: 28
                 radius: 8
-                color: "#1d1d1d"
+                color: "#181818"
                 border.color: Theme.border
                 border.width: 1
 

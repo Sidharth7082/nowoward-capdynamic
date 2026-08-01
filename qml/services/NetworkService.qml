@@ -36,12 +36,23 @@ QtObject {
         running: false
     }
 
+    property var _procSettings: Process {
+        command: []
+        running: false
+    }
+
     function toggleWifi() {
         const nextState = root.enabled ? "off" : "on";
         root.enabled = !root.enabled;
         root._procToggle.command = ["nmcli", "radio", "wifi", nextState];
         root._procToggle.running = false;
         root._procToggle.running = true;
+    }
+
+    function openSettings() {
+        root._procSettings.command = ["sh", "-c", "nm-connection-editor 2>/dev/null || gnome-control-center wifi 2>/dev/null || kitty -e nmtui 2>/dev/null || foot -e nmtui 2>/dev/null || nmtui"];
+        root._procSettings.running = false;
+        root._procSettings.running = true;
     }
 
     property var _timer: Timer {
