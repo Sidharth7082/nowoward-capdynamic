@@ -324,6 +324,17 @@ Item {
                 color: "#181818"
                 border.color: Theme.border
                 border.width: 1
+                clip: true
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    height: 3
+                    width: parent.width * ((BatteryService.present ? BatteryService.percentage : 98) / 100.0)
+                    color: "#10b981"
+                    radius: 1.5
+                    Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                }
 
                 Row {
                     anchors.centerIn: parent
@@ -346,6 +357,17 @@ Item {
                 color: "#181818"
                 border.color: Theme.border
                 border.width: 1
+                clip: true
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    height: 3
+                    width: parent.width * Math.min(1.0, CpuService.usagePercent / 100.0)
+                    color: "#3b82f6"
+                    radius: 1.5
+                    Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                }
 
                 Row {
                     anchors.centerIn: parent
@@ -368,6 +390,17 @@ Item {
                 color: "#181818"
                 border.color: Theme.border
                 border.width: 1
+                clip: true
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    height: 3
+                    width: parent.width * Math.min(1.0, MemService.usagePercent / 100.0)
+                    color: "#a855f7"
+                    radius: 1.5
+                    Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                }
 
                 Row {
                     anchors.centerIn: parent

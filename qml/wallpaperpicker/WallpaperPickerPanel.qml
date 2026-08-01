@@ -13,6 +13,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
 import QtCore
+import "../theme"
 
 Item {
     id: root
@@ -196,7 +197,9 @@ Item {
             width: 1100
             height: 210
             radius: 20
-            color: Qt.rgba(0.04, 0.04, 0.04, 0.88)
+            color: Colors.background
+            border.color: Colors.border
+            border.width: 1
 
             focus: root.shown
             Keys.onEscapePressed: root.hide()
@@ -260,7 +263,7 @@ Item {
                         NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
                     }
 
-                    property real op: isCurrent ? 1.0 : onPath ? 0.65 : 0.0
+                    property real op: isCurrent ? 1.0 : onPath ? 0.92 : 0.0
                     Behavior on op {
                         NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
                     }
@@ -286,7 +289,7 @@ Item {
                             width: root.cardW
                             height: root.cardH
                             radius: 14
-                            color: "#1a1a1a"
+                            color: "#0a0a0a"
 
                             Image {
                                 anchors.fill: parent
@@ -301,12 +304,24 @@ Item {
 
                                 Rectangle {
                                     anchors.fill: parent
-                                    color: "#282828"
+                                    color: "#181818"
                                     opacity: parent.status === Image.Ready ? 0 : 1
 
                                     Behavior on opacity {
                                         NumberAnimation { duration: 200 }
                                     }
+                                }
+                            }
+
+                            // Dark overlay to keep thumbnails rich, deep, and dark
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "#000000"
+                                opacity: del.isCurrent ? 0.20 : 0.50
+                                radius: 14
+
+                                Behavior on opacity {
+                                    NumberAnimation { duration: 150 }
                                 }
                             }
                         }

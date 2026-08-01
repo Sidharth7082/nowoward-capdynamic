@@ -296,21 +296,27 @@ PanelWindow {
         border.color: Theme.border
         border.width: 1
         clip: true
+        scale: gestureArea.containsPress ? 0.975 : (gestureArea.containsMouse ? 1.012 : 1.0)
+        transformOrigin: Item.Center
+
+        Behavior on scale {
+            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+        }
 
         Behavior on y {
-            NumberAnimation { duration: 320; easing.type: Easing.OutExpo }
+            NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
         }
         Behavior on opacity {
             NumberAnimation { duration: 250; easing.type: Easing.OutQuad }
         }
         Behavior on width {
-            NumberAnimation { duration: 320; easing.type: Easing.OutExpo }
+            NumberAnimation { duration: 350; easing.type: Easing.OutBack }
         }
         Behavior on height {
-            NumberAnimation { duration: 320; easing.type: Easing.OutExpo }
+            NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
         }
         Behavior on radius {
-            NumberAnimation { duration: 320; easing.type: Easing.OutExpo }
+            NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
         }
 
         MouseArea {
@@ -524,11 +530,12 @@ PanelWindow {
                 model: root.pages
 
                 Rectangle {
-                    width: 5
+                    width: root.page === modelData ? 14 : 5
                     height: 5
                     radius: 2.5
                     color: root.page === modelData ? Theme.text : "#555555"
 
+                    Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
             }
