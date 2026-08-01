@@ -23,7 +23,7 @@ NotificationServer {
         if (root.list.includes(n)) return;
 
         const notifItem = {
-            id: n.id || Date.now(),
+            id: n.id || Date.now() + Math.random(),
             appName: n.appName || "Notification",
             summary: n.summary || "",
             body: n.body || "",
@@ -41,6 +41,10 @@ NotificationServer {
             if (root.latestNotification === n)
                 root.latestNotification = null;
         });
+    }
+
+    function removeHistoryItem(itemId) {
+        root.history = root.history.filter(function(x) { return x.id !== itemId; });
     }
 
     function clearHistory() {
