@@ -57,10 +57,11 @@ Item {
         // Empty state
         Text {
             visible: NotificationService.history.length === 0
+            width: parent.width
             text: "No recent notifications"
             color: Theme.muted
             font.pixelSize: 12
-            anchors.centerIn: parent
+            horizontalAlignment: Text.AlignHCenter
         }
 
         // Notification List
