@@ -5,6 +5,9 @@ import "../theme"
 Item {
     id: root
 
+    signal wifiRightClicked()
+    signal btRightClicked()
+
     anchors.fill: parent
 
     Column {
@@ -92,7 +95,7 @@ Item {
                         if (mouse.button === Qt.LeftButton) {
                             NetworkService.toggleWifi();
                         } else if (mouse.button === Qt.RightButton) {
-                            NetworkService.openSettings();
+                            root.wifiRightClicked();
                         }
                     }
                 }
@@ -173,7 +176,7 @@ Item {
                         if (mouse.button === Qt.LeftButton) {
                             BluetoothService.toggleBluetooth();
                         } else if (mouse.button === Qt.RightButton) {
-                            BluetoothService.openSettings();
+                            root.btRightClicked();
                         }
                     }
                 }

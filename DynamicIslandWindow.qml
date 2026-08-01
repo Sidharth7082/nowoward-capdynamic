@@ -13,7 +13,7 @@ PanelWindow {
     id: root
 
     property bool expanded: false
-    property string page: "clock"   // "clock" | "player" | "stats"
+    property string page: "clock"   // "clock" | "player" | "stats" | "wifi" | "bluetooth"
     property var pages: ["clock", "player", "stats"]
 
     readonly property int topMargin: 10
@@ -86,6 +86,8 @@ PanelWindow {
     function showPlayer() { root.page = "player"; root.expanded = true; }
     function showClock() { root.page = "clock"; root.expanded = true; }
     function showStats() { root.page = "stats"; root.expanded = true; }
+    function showWifi() { root.page = "wifi"; root.expanded = true; }
+    function showBluetooth() { root.page = "bluetooth"; root.expanded = true; }
 
     function nextPage() {
         let idx = pages.indexOf(root.page);
@@ -108,7 +110,11 @@ PanelWindow {
                 ? Theme.collapsedWidth
                 : (root.page === "player"
                     ? Theme.playerWidth
-                    : (root.page === "stats" ? Theme.statsWidth : Theme.clockWidth))))
+                    : (root.page === "stats"
+                        ? Theme.statsWidth
+                        : (root.page === "wifi"
+                            ? Theme.wifiWidth
+                            : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth))))))
 
     readonly property int targetHeight: peekingNotif
         ? Theme.notificationHeight
@@ -118,7 +124,11 @@ PanelWindow {
                 ? Theme.collapsedHeight
                 : (root.page === "player"
                     ? Theme.playerHeight
-                    : (root.page === "stats" ? Theme.statsHeight : Theme.clockHeight))))
+                    : (root.page === "stats"
+                        ? Theme.statsHeight
+                        : (root.page === "wifi"
+                            ? Theme.wifiHeight
+                            : (root.page === "bluetooth" ? Theme.btHeight : Theme.clockHeight))))))
 
     color: "transparent"
     anchors { top: true; left: true; right: true }
@@ -453,13 +463,44 @@ PanelWindow {
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
             }
 
-            // Page 3: System Stats
+            // Page 3: System Stats / Control Center
             IslandSystemStats {
                 id: statsPage
                 anchors.fill: parent
                 opacity: root.page === "stats" ? 1 : 0
                 scale: root.page === "stats" ? 1 : 0.92
                 visible: opacity > 0.01
+
+                onWifiRightClicked: root.showWifi()
+                onBtRightClicked: root.showBluetooth()
+
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+            }
+
+            // Page 4: Wi-Fi Detail Page
+            IslandWifiLayer {
+                id: wifiPage
+                anchors.fill: parent
+                opacity: root.page === "wifi" ? 1 : 0
+                scale: root.page === "wifi" ? 1 : 0.92
+                visible: opacity > 0.01
+
+                onBackClicked: root.showStats()
+
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+            }
+
+            // Page 5: Bluetooth Detail Page
+            IslandBluetoothLayer {
+                id: btPage
+                anchors.fill: parent
+                opacity: root.page === "bluetooth" ? 1 : 0
+                scale: root.page === "bluetooth" ? 1 : 0.92
+                visible: opacity > 0.01
+
+                onBackClicked: root.showStats()
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
                 Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }

@@ -7,6 +7,7 @@ QtObject {
 
     property bool enabled: true
     property string ssid: "Connected"
+    property var networkList: []
 
     property var _procStatus: Process {
         command: ["sh", "-c", "nmcli radio wifi 2>/dev/null || echo 'enabled'"]
@@ -31,6 +32,16 @@ QtObject {
         }
     }
 
+    property var _procScan: Process {
+        command: ["sh", "-c", "nmcli -t -f IN-USE,SSID,SIGNAL,SECURITY dev wifi 2>/dev/null | grep -v '^:' || echo ''"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: (text) => {
+                root._parseNetworks(text);
+            }
+        }
+    }
+
     property var _procToggle: Process {
         command: []
         running: false
@@ -49,10 +60,46 @@ QtObject {
         root._procToggle.running = true;
     }
 
+    function scanNetworks() {
+        root._procScan.running = false;
+        root._procScan.running = true;
+    }
+
     function openSettings() {
         root._procSettings.command = ["sh", "-c", "nm-connection-editor 2>/dev/null || gnome-control-center wifi 2>/dev/null || kitty -e nmtui 2>/dev/null || foot -e nmtui 2>/dev/null || nmtui"];
         root._procSettings.running = false;
         root._procSettings.running = true;
+    }
+
+    function _parseNetworks(raw) {
+        if (!raw) return;
+        const lines = raw.trim().split("\n");
+        let results = [];
+        let seen = {};
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const parts = line.split(":");
+            if (parts.length >= 3) {
+                const inUse = parts[0] === "*";
+                const netSsid = parts[1].trim();
+                const signal = parseInt(parts[2]) || 0;
+                const sec = parts.length >= 4 ? parts[3].trim() : "Open";
+
+                if (netSsid && !seen[netSsid]) {
+                    seen[netSsid] = true;
+                    results.push({
+                        inUse: inUse,
+                        ssid: netSsid,
+                        signal: signal,
+                        security: sec
+                    });
+                }
+            }
+        }
+
+        root.networkList = results;
     }
 
     property var _timer: Timer {
@@ -65,6 +112,7 @@ QtObject {
             root._procStatus.running = true;
             root._procSsid.running = false;
             root._procSsid.running = true;
+            root.scanNetworks();
         }
     }
 }

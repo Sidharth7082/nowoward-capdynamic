@@ -69,6 +69,14 @@ Scope {
         function stats() {
             shellRoot.forFocusedWindow((window) => window.showStats());
         }
+
+        function wifi() {
+            shellRoot.forFocusedWindow((window) => window.showWifi());
+        }
+
+        function bluetooth() {
+            shellRoot.forFocusedWindow((window) => window.showBluetooth());
+        }
     }
 
     // quickshell ipc call picker toggle / show / hide
