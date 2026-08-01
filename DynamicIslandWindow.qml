@@ -189,6 +189,23 @@ PanelWindow {
 
     // Auto-peek for Volume
     property bool peekingVolume: false
+    property bool peekingWorkspace: false
+
+    Connections {
+        target: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace : null
+        function onIdChanged() {
+            if (!root.expanded && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
+                root.peekingWorkspace = true;
+                wsTimer.restart();
+            }
+        }
+    }
+
+    Timer {
+        id: wsTimer
+        interval: 1500
+        onTriggered: root.peekingWorkspace = false
+    }
 
     Connections {
         target: mpris
@@ -385,6 +402,15 @@ PanelWindow {
                     root.notifyActivity();
                 }
             }
+            onWheel: (wheel) => {
+                if (root.expanded) {
+                    if (wheel.angleDelta.y < 0 || wheel.angleDelta.x > 0)
+                        root.nextPage();
+                    else if (wheel.angleDelta.y > 0 || wheel.angleDelta.x < 0)
+                        root.prevPage();
+                    root.notifyActivity();
+                }
+            }
         }
 
         // Collapsed content
@@ -407,6 +433,17 @@ PanelWindow {
             visible: opacity > 0.01
 
             Behavior on opacity { NumberAnimation { duration: 150 } }
+        }
+
+        // Workspace Change Peek Content
+        IslandWorkspaceLayer {
+            anchors.fill: parent
+            workspaceId: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.id : 1
+            workspaceName: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.name : "1"
+            opacity: (root.peekingWorkspace && !root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
+            visible: opacity > 0.01
+
+            Behavior on opacity { NumberAnimation { duration: 180 } }
         }
 
         // Notification Peek Content
