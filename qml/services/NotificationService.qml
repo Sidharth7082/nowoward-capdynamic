@@ -43,6 +43,21 @@ NotificationServer {
         });
     }
 
+    function pushCustom(data) {
+        if (!data) return;
+        const notifItem = {
+            id: Date.now() + Math.random(),
+            appName: data.appName || "System",
+            summary: data.summary || "",
+            body: data.body || "",
+            appIcon: data.appIcon || "",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        root.history = [notifItem, ...root.history.slice(0, 19)];
+        root.latestNotification = notifItem;
+        root.notificationAdded(notifItem);
+    }
+
     function removeHistoryItem(itemId) {
         root.history = root.history.filter(function(x) { return x.id !== itemId; });
     }
@@ -53,7 +68,7 @@ NotificationServer {
 
     function dismissLatest() {
         if (root.latestNotification) {
-            root.latestNotification.dismiss();
+            if (root.latestNotification.dismiss) root.latestNotification.dismiss();
             root.latestNotification = null;
         }
     }

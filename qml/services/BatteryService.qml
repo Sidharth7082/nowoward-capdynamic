@@ -10,6 +10,33 @@ QtObject {
     property int percentage: 100
     property bool charging: false
 
+    property bool _initialized: false
+    property bool _prevCharging: false
+
+    onChargingChanged: {
+        if (!_initialized) {
+            _initialized = true;
+            _prevCharging = charging;
+            return;
+        }
+        if (charging !== _prevCharging) {
+            _prevCharging = charging;
+            if (charging) {
+                NotificationService.pushCustom({
+                    appName: "Power",
+                    summary: "⚡ Charger Connected",
+                    body: "Charging: " + percentage + "%"
+                });
+            } else {
+                NotificationService.pushCustom({
+                    appName: "Power",
+                    summary: "🔋 Charger Disconnected",
+                    body: "Battery level: " + percentage + "%"
+                });
+            }
+        }
+    }
+
     property var _proc: Process {
         id: proc
         command: ["sh", "-c", "cap=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n 1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n 1); echo \"$cap|$stat\""]
@@ -34,7 +61,7 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 3000
+        interval: 2500
         running: root.active
         repeat: true
         triggeredOnStart: true

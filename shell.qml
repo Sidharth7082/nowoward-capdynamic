@@ -16,6 +16,7 @@ Scope {
     property var _brightService: BrightnessService
     property var _netService: NetworkService
     property var _btService: BluetoothService
+    property var _usbService: UsbService
 
     function forEachWindow(callback) {
         const windows = panelVariants.instances ? panelVariants.instances : [];

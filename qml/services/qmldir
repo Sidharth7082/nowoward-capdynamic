@@ -6,3 +6,4 @@ singleton VolumeService 1.0 VolumeService.qml
 singleton BrightnessService 1.0 BrightnessService.qml
 singleton NetworkService 1.0 NetworkService.qml
 singleton BluetoothService 1.0 BluetoothService.qml
+singleton UsbService 1.0 UsbService.qml
