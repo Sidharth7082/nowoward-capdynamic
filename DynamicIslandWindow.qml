@@ -26,18 +26,20 @@ PanelWindow {
         && hyprMonitor.activeWorkspace
         && hyprMonitor.activeWorkspace.hasFullscreen
 
+    property bool hoverRevealed: false
+
     readonly property bool shouldHidePill: !root.expanded
         && !root.peeking
         && !root.peekingNotif
         && !root.peekingVolume
-        && !root.hoverExpanded
+        && !root.hoverRevealed
 
     visible: !hideForFullscreen && !suppressPeek
 
     onSuppressPeekChanged: {
         if (suppressPeek) {
             root.setExpanded(false);
-            root.hoverExpanded = false;
+            root.hoverRevealed = false;
             root.peeking = false;
             root.peekingNotif = false;
             root.peekingVolume = false;
@@ -52,7 +54,7 @@ PanelWindow {
     onHideForFullscreenChanged: {
         if (hideForFullscreen) {
             root.setExpanded(false);
-            root.hoverExpanded = false;
+            root.hoverRevealed = false;
             root.peeking = false;
             root.peekingNotif = false;
             root.peekingVolume = false;
@@ -145,9 +147,15 @@ PanelWindow {
         cursorShape: Qt.PointingHandCursor
 
         onEntered: {
-            if (!root.expanded && !root.suppressPeek && !root.hideForFullscreen) {
-                root.hoverExpanded = true;
-                root.setExpanded(true);
+            leaveTimer.stop();
+            if (!root.suppressPeek && !root.hideForFullscreen) {
+                root.hoverRevealed = true;
+            }
+        }
+
+        onExited: {
+            if (root.hoverRevealed || root.expanded) {
+                leaveTimer.restart();
             }
         }
     }
@@ -208,8 +216,6 @@ PanelWindow {
         }
     }
 
-    property bool hoverExpanded: false
-
     Timer {
         id: peekTimer
         interval: 3000
@@ -226,8 +232,8 @@ PanelWindow {
         interval: 1500
         repeat: false
         onTriggered: {
-            if (root.hoverExpanded && !gestureArea.containsMouse) {
-                root.hoverExpanded = false;
+            if (!gestureArea.containsMouse && !edgeTrigger.containsMouse) {
+                root.hoverRevealed = false;
                 root.setExpanded(false);
             }
         }
@@ -261,7 +267,7 @@ PanelWindow {
         repeat: false
         onTriggered: {
             if (root.expanded && !root.peeking && !root.peekingNotif && !root.peekingVolume) {
-                root.hoverExpanded = false;
+                root.hoverRevealed = false;
                 root.setExpanded(false);
             }
         }
@@ -308,14 +314,13 @@ PanelWindow {
 
             onEntered: {
                 leaveTimer.stop();
-                if (!root.expanded && !root.suppressPeek && !root.hideForFullscreen) {
-                    root.hoverExpanded = true;
-                    root.setExpanded(true);
+                if (!root.suppressPeek && !root.hideForFullscreen) {
+                    root.hoverRevealed = true;
                 }
             }
 
             onExited: {
-                if (root.hoverExpanded) {
+                if (root.hoverRevealed || root.expanded) {
                     leaveTimer.restart();
                 }
             }
@@ -324,7 +329,6 @@ PanelWindow {
                 pressX = mouse.x;
                 dragging = false;
                 leaveTimer.stop();
-                root.hoverExpanded = false; // User click converts hover into pinned/active expansion
                 if (root.peeking) {
                     root.peeking = false;
                     peekTimer.stop();
