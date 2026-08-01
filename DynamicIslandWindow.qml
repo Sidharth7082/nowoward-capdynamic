@@ -26,14 +26,7 @@ PanelWindow {
         && hyprMonitor.activeWorkspace
         && hyprMonitor.activeWorkspace.hasFullscreen
 
-    property bool autohideWhenWorking: true
-    readonly property bool hasActiveWindows: hyprMonitor
-        && hyprMonitor.activeWorkspace
-        && hyprMonitor.activeWorkspace.windows > 0
-
-    readonly property bool shouldHidePill: autohideWhenWorking
-        && hasActiveWindows
-        && !root.expanded
+    readonly property bool shouldHidePill: !root.expanded
         && !root.peeking
         && !root.peekingNotif
         && !root.peekingVolume
