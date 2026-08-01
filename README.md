@@ -1,12 +1,23 @@
-# nowoward-capdynamic
+<div align="center">
 
-A sleek, macOS-inspired **Dynamic Island** widget and **Cover-Flow Wallpaper Picker** built for **Hyprland (Wayland)** using **Quickshell + QML**, with native support for **MyGlass (Liquid Glass)**!
+# 🏝️ nowoward-capdynamic
+
+### **Apple-Style Dynamic Island & Cover-Flow Wallpaper Picker for Hyprland**
+
+*Bring fluid macOS-inspired Dynamic Island capsules, interactive Control Center cards, live MPRIS audio visualizers, and liquid glass wallpaper browsing to your Wayland desktop!*
+
+[![Hyprland](https://img.shields.io/badge/Compositor-Hyprland-blue?style=for-the-badge&logo=archlinux&logoColor=white)](https://hyprland.org)
+[![Quickshell](https://img.shields.io/badge/Framework-Quickshell%20%2B%20QML-8a2be2?style=for-the-badge)](https://quickshell.org)
+[![MyGlass](https://img.shields.io/badge/Plugin-MyGlass%20Supported-00f2fe?style=for-the-badge)](https://github.com/Sidharth7082/myglass)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+</div>
 
 ---
 
-## ⚡ One-Line Install & Launch
+## ⚡ 1-Minute Instant Launch
 
-Run this single command in your terminal to download dependencies, clone, and launch immediately:
+Copy and paste this single command into your terminal to clone, set up, and run immediately:
 
 ```bash
 git clone https://github.com/Sidharth7082/nowoward-capdynamic.git ~/.config/quickshell/nowoward-capdynamic && quickshell -p ~/.config/quickshell/nowoward-capdynamic
@@ -14,24 +25,18 @@ git clone https://github.com/Sidharth7082/nowoward-capdynamic.git ~/.config/quic
 
 ---
 
-## 🧊 How to Enable MyGlass Liquid Glass Mode (Step-by-Step)
+## 🧊 How to Enable MyGlass Mode (Liquid Glass)
 
-Follow these simple steps to turn on **[MyGlass](https://github.com/Sidharth7082/myglass)** Apple-style liquid frosted glass effects on the Dynamic Island:
+If you use **[MyGlass](https://github.com/Sidharth7082/myglass)** for Apple-style liquid frosted glass effects on Hyprland, follow these 3 simple steps:
 
-### 📥 Step 1: Download & Install MyGlass Plugin
-If you haven't installed MyGlass yet, run this single command in your terminal:
-
+### 📥 Step 1: Download & Install MyGlass
 ```bash
 hyprpm add https://github.com/Sidharth7082/myglass && hyprpm update && hyprpm enable myglass
 ```
 
----
-
-### ⚙️ Step 2: Add Dynamic Island to MyGlass Config
+### ⚙️ Step 2: Configure Layer Surface Rules
 
 #### Option A: Lua Config (`~/.config/hypr/module/myglass.lua`)
-Add `nowoward-capdynamic` and `nowoward-capdynamic-wallpaperpicker` to your `myglass.lua`:
-
 ```lua
 if hl.plugin and hl.plugin.myglass then
     local hg = hl.plugin.myglass
@@ -44,15 +49,13 @@ if hl.plugin and hl.plugin.myglass then
         blur_strength = 0.04,
     })
 
-    -- Enable liquid glass effect on Dynamic Island & Wallpaper Picker
+    -- Enable liquid glass on Dynamic Island & Wallpaper Picker
     hg.layer("nowoward-capdynamic", { preset = "clear" })
     hg.layer("nowoward-capdynamic-wallpaperpicker", { preset = "clear" })
 end
 ```
 
-#### Option B: Standard Config (`hyprland.conf`)
-If you use legacy `hyprland.conf`:
-
+#### Option B: Legacy Config (`hyprland.conf`)
 ```ini
 plugin:myglass {
     default_theme = dark
@@ -67,26 +70,26 @@ plugin:myglass {
 }
 ```
 
----
-
 ### 🔄 Step 3: Reload Hyprland
-Reload Hyprland to activate liquid glass mode:
-
 ```bash
 hyprctl reload
 ```
 
 ---
 
-## 🖼️ Screenshots (Default Dynamic Island)
+## 🖼️ Visual Showcase
 
-| 🕒 Clock & Date Page | 🎵 Music Player Page |
-| :---: | :---: |
-| ![Clock Page](assets/default_island/clock_page.png) | ![Music Player Page](assets/default_island/music_page.png) |
+<div align="center">
 
-| ⚙️ Control Panel | 🖼️ Cover-Flow Wallpaper Picker |
+### 🌟 Default Dynamic Island
+
+| 🕒 Clock & Date Page | 🎵 MPRIS Music Player |
 | :---: | :---: |
-| ![Control Panel](assets/default_island/control_panel.png) | ![Wallpaper Picker](assets/default_island/wallpaper_picker.png) |
+| ![Clock Page](assets/default_island/clock_page.png) | ![Music Player](assets/default_island/music_page.png) |
+
+| ⚙️ Control Center & System Stats | 🖼️ Cover-Flow Wallpaper Picker |
+| :---: | :---: |
+| ![Control Center](assets/default_island/control_panel.png) | ![Wallpaper Picker](assets/default_island/wallpaper_picker.png) |
 
 | 💊 Collapsed Clock Pill |
 | :---: |
@@ -94,150 +97,145 @@ hyprctl reload
 
 ---
 
-## 🧊 Screenshots (MyGlass Mode)
+### 🧊 MyGlass Liquid Glass Mode
 
 | 🖼️ Cover-Flow Wallpaper Picker | 🕒 Clock & Date Page |
 | :---: | :---: |
 | ![Wallpaper Picker](assets/myglass_on_island/wallpaper_picker.png) | ![Clock Page](assets/myglass_on_island/clock_page.png) |
 
-| 🎵 Music Player Page | ⚙️ Control Panel |
+| 🎵 MPRIS Music Player | ⚙️ Control Center & System Stats |
 | :---: | :---: |
-| ![Music Player Page](assets/myglass_on_island/music_page.png) | ![Control Panel](assets/myglass_on_island/control_panel.png) |
+| ![Music Player](assets/myglass_on_island/music_page.png) | ![Control Center](assets/myglass_on_island/control_panel.png) |
 
 | 💊 Collapsed Clock Pill |
 | :---: |
 | ![Collapsed Pill](assets/myglass_on_island/collapsed_pill.png) |
 
----
-
-## ✨ Features
-
-- **🏝️ Dynamic Island**:
-  - **Clock & Date Page**: Minimal clock pill that reveals on hover and expands on click.
-  - **Live MPRIS Media Player**: Controls Spotify, Brave, mpv, or any MPRIS player with animated visualizer bars.
-  - **Control Center & System Monitor**: Real-time CPU %, RAM %, Battery %, interactive Brightness & Volume sliders, plus Wi-Fi & Bluetooth toggles.
-  - **Dedicated Wi-Fi & Bluetooth Sub-Pages**: In-island live network scanning, device discovery, and status management.
-  - **DBus Notification Toasts**: Auto-peeks desktop alerts with app badges & text summaries.
-  - **Volume Status Overlay**: Transient audio level indicator pill when volume changes.
-  - **Top-Edge Hover Reveal**: Automatically stays hidden offscreen until your cursor touches the top edge of the monitor.
-  - **Smart Auto-Hide**: Hides when windows are open to keep browser tabs and window titlebars 100% clear.
-- **🖼️ Cover-Flow Wallpaper Picker**:
-  - PathView cover-flow wallpaper browser over `~/Pictures/Wallpapers`.
-  - Generates instant thumbnails via `ffmpeg` and applies wallpapers via `awww` or `mpvpaper`.
+</div>
 
 ---
 
-## 📦 Dependencies
+## ✨ Features & Component Highlights
 
-### Required
-- **Hyprland** (Wayland compositor)
-- **[Quickshell](https://quickshell.org/)** (`quickshell` binary on PATH)
-- **`ffmpeg`** (For thumbnail generation)
-- **`awww`** (For applying static wallpapers)
-
-### Recommended (For Control Center & Media Features)
-- **`brightnessctl`** (Display brightness slider control)
-- **`nmcli`** / **NetworkManager** (Wi-Fi status & toggle)
-- **`bluetoothctl`** / **BlueZ** (Bluetooth status & toggle)
-- **`wpctl`** / **WirePlumber** (Audio volume slider & volume indicator overlay)
-- **`mpvpaper`** (Optional: for animated/video wallpapers)
-
-#### Install Dependencies on Arch Linux:
-```bash
-# Core dependencies
-sudo pacman -S quickshell ffmpeg networkmanager bluez bluez-utils brightnessctl wireplumber
-
-# Wallpaper backend (AUR)
-yay -S awww mpvpaper
-```
+| Feature | Description |
+| :--- | :--- |
+| **🏝️ Dynamic Capsule Morphing** | Smooth Apple-style `OutBack` spring physics that expand, collapse, and scale dynamically on interaction. |
+| **🕒 Minimal Clock & Date** | Compact clock pill that reveals when cursor reaches top edge and expands into date view on click. |
+| **🎵 Live MPRIS Visualizer** | Controls Spotify, Brave, mpv, or any MPRIS player with spinning album art and live animated audio frequency bars. |
+| **⚙️ Control Center Card** | Interactive Brightness & Volume sliders, real-time CPU %, RAM %, and Battery % badges with animated fill bars. |
+| **📶 Wi-Fi Sub-Page** | Left-click toggle, right-click opens dedicated in-island network scanner page with live SSIDs and signal strength. |
+| **🔵 Bluetooth Sub-Page** | Left-click toggle, right-click opens dedicated in-island device scanner page with auto-start daemon prompt. |
+| **🔔 DBus Notification Toasts** | Automatically peeks desktop alerts with app badges, titles, and text summaries. |
+| **🔊 Transient Volume Overlay** | Displays a sleek audio level indicator pill whenever hardware volume keys are pressed. |
+| **🎯 Top-Edge Sensor** | Remains 100% hidden offscreen until pointer touches top monitor edge. |
+| **🙈 Window Auto-Hide** | Hides automatically when active workspace windows are present to keep titlebars and browser tabs clear. |
+| **🖼️ Cover-Flow Wallpaper Browser** | Smooth PathView wallpaper carousel with `ffmpeg` thumbnail caching and `awww` / `mpvpaper` backends. |
 
 ---
 
-## 🛠️ Detailed Step-by-Step Setup
+## 📦 Dependency Matrix
 
-### Step 1: Clone the Repository
-Clone the project into your user config folder:
+| Category | Package Name | Command / Source | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Core** | `hyprland` | `sudo pacman -S hyprland` | Wayland Compositor |
+| **Core** | `quickshell` | `quickshell` (PATH) | QML Desktop Shell Framework |
+| **Core** | `ffmpeg` | `sudo pacman -S ffmpeg` | Wallpaper Thumbnail Generation |
+| **Wallpaper** | `awww` | `yay -S awww` | Static Wallpaper Backend |
+| **Wallpaper** | `mpvpaper` | `yay -S mpvpaper` (Optional) | Video Wallpaper Backend |
+| **Control** | `brightnessctl` | `sudo pacman -S brightnessctl` | Display Brightness Slider Control |
+| **Control** | `wireplumber` | `sudo pacman -S wireplumber` | Audio Volume Slider Control |
+| **Control** | `networkmanager` | `sudo pacman -S networkmanager` | Wi-Fi Power & Network Scanning |
+| **Control** | `bluez-utils` | `sudo pacman -S bluez bluez-utils` | Bluetooth Power & Device Scanning |
+| **Plugin** | `myglass` | `hyprpm add https://github.com/Sidharth7082/myglass` | Frosted Liquid Glass Effects |
 
-```bash
-git clone https://github.com/Sidharth7082/nowoward-capdynamic.git ~/.config/quickshell/nowoward-capdynamic
+---
+
+## 🎮 IPC Command Reference
+
+Control the Dynamic Island or Wallpaper Picker from terminal scripts, waybar buttons, or custom keybinds:
+
+| Action | Command |
+| :--- | :--- |
+| **Toggle Island Expand / Collapse** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle` |
+| **Show Clock Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide clock` |
+| **Show Music Player Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide player` |
+| **Show Control Center Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide stats` |
+| **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide wifi` |
+| **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide bluetooth` |
+| **Toggle Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle` |
+| **Force Show Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker show` |
+| **Force Hide Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker hide` |
+
+---
+
+## ⚙️ Hyprland Configuration Guide
+
+### 📜 Lua Setup (`~/.config/hypr/module/autostart.lua` & `keybind.lua`)
+
+```lua
+-- autostart.lua
+hl.on("hyprland.start", function ()
+    hl.exec_cmd("quickshell -p ~/.config/quickshell/nowoward-capdynamic &")
+end)
+
+-- keybind.lua
+hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle"))
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
 ```
 
-### Step 2: Prepare Wallpapers Folder
-Create the wallpapers directory and add your wallpaper images (`.png`, `.jpg`, `.webp`, `.mp4`):
+### 📝 Legacy Setup (`hyprland.conf`)
 
-```bash
-mkdir -p ~/Pictures/Wallpapers
-```
-
-### Step 3: Run the Widget
-Launch the shell:
-
-```bash
-quickshell -p ~/.config/quickshell/nowoward-capdynamic
-```
-
-### Step 4: Configure Hyprland Auto-Start & Keybindings
-Add these lines to your `~/.config/hypr/hyprland.conf`:
-
-```conf
-# Auto-start Dynamic Island on login
+```ini
+# Autostart
 exec-once = quickshell -p ~/.config/quickshell/nowoward-capdynamic
 
 # Keybindings
-bind = SUPER, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
 bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle
+bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
 ```
 
 ---
 
-## 🎮 IPC Controls
+## 📁 Repository Structure
 
-You can control the island or wallpaper picker from any terminal script or keybind:
-
-```bash
-# Dynamic Island Page Controls
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle   # Toggle expand/collapse
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide clock    # Jump to Clock page
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide player   # Jump to Music Player page
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide stats    # Jump to Control Center page
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide wifi     # Jump to Wi-Fi Networks page
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide bluetooth # Jump to Bluetooth Devices page
-
-# Wallpaper Picker Controls
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle # Open/close wallpaper picker
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker show   # Force show picker
-quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker hide   # Force hide picker
+```
+nowoward-capdynamic/
+├── shell.qml                              # Main entrypoint & IPC handlers ("tide" & "picker")
+├── DynamicIslandWindow.qml                # Capsule geometry, animations, mask, spring physics
+├── qml/
+│   ├── theme/
+│   │   ├── Colors.qml                     # Translucent glass color tokens
+│   │   └── Theme.qml                      # Capsule dimensions & metrics
+│   ├── services/
+│   │   ├── CpuService.qml                 # CPU % monitor (/proc/stat)
+│   │   ├── MemService.qml                 # RAM % monitor (/proc/meminfo)
+│   │   ├── BatteryService.qml             # Battery capacity monitor
+│   │   ├── NotificationService.qml        # DBus Notification listener
+│   │   ├── VolumeService.qml              # WirePlumber audio control
+│   │   ├── BrightnessService.qml          # brightnessctl display control
+│   │   ├── NetworkService.qml             # NetworkManager Wi-Fi scanner
+│   │   └── BluetoothService.qml           # BlueZ Bluetooth scanner
+│   ├── island/
+│   │   ├── IslandClock.qml                # Clock & date formatter
+│   │   ├── IslandMprisController.qml      # MPRIS player transport
+│   │   ├── MusicPlayerLayer.qml           # Music player UI
+│   │   ├── MusicVisualizer.qml            # Live audio frequency bars
+│   │   ├── IslandSystemStats.qml          # Control Center card UI
+│   │   ├── IslandWifiLayer.qml            # Dedicated Wi-Fi sub-page UI
+│   │   ├── IslandBluetoothLayer.qml       # Dedicated Bluetooth sub-page UI
+│   │   ├── IslandNotificationLayer.qml    # Notification toast UI
+│   │   └── IslandVolumeLayer.qml          # Volume overlay UI
+│   └── wallpaperpicker/
+│       └── WallpaperPickerPanel.qml       # Cover-flow wallpaper browser
+└── assets/
+    ├── default_island/                    # Default mode screenshot assets
+    └── myglass_on_island/                 # MyGlass mode screenshot assets
 ```
 
 ---
 
-## 📁 Project Architecture
+## 📜 License & Credits
 
-```
-shell.qml                              Entrypoint & IPC handlers ("tide" & "picker")
-DynamicIslandWindow.qml                Island capsule geometry, animations, mask, hover reveal
-qml/theme/
-  Colors.qml                           Color palette definitions (Translucent glass for MyGlass)
-  Theme.qml                            Geometry metrics & dimensions
-qml/services/
-  CpuService.qml                       CPU usage monitor (/proc/stat)
-  MemService.qml                       RAM usage monitor (/proc/meminfo)
-  BatteryService.qml                   Battery capacity monitor (/sys/class/power_supply)
-  NotificationService.qml              DBus Notification server listener
-  VolumeService.qml                    WirePlumber / PulseAudio volume control
-  BrightnessService.qml                brightnessctl display brightness control
-  NetworkService.qml                   NetworkManager Wi-Fi monitor & toggle
-  BluetoothService.qml                 BlueZ Bluetooth monitor & toggle
-qml/island/
-  IslandClock.qml                      Clock tick source
-  IslandMprisController.qml            MPRIS player state & transport
-  MusicPlayerLayer.qml                 Music player page UI
-  MusicVisualizer.qml                  Animated audio visualizer bars
-  IslandSystemStats.qml                Control Center & System Monitor card UI
-  IslandWifiLayer.qml                  Dedicated Wi-Fi sub-page UI
-  IslandBluetoothLayer.qml             Dedicated Bluetooth sub-page UI
-  IslandNotificationLayer.qml          DBus Notification toast UI
-  IslandVolumeLayer.qml                Volume level overlay UI
-qml/wallpaperpicker/
-  WallpaperPickerPanel.qml             PathView cover-flow wallpaper picker
-```
+- Created & Maintained by **[Sidharth7082](https://github.com/Sidharth7082)** (Capture)
+- Built with **[Quickshell](https://quickshell.org)** for **[Hyprland](https://hyprland.org)**
+- Open Source under the **MIT License**
