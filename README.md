@@ -61,7 +61,23 @@ hyprctl reload
 
 ---
 
-## 🖼️ Screenshots (MyGlass on Island)
+## 🖼️ Screenshots (Default Dynamic Island)
+
+| 🕒 Clock & Date Page | 🎵 Music Player Page |
+| :---: | :---: |
+| ![Clock Page](assets/default_island/clock_page.png) | ![Music Player Page](assets/default_island/music_page.png) |
+
+| ⚙️ Control Panel | 🖼️ Cover-Flow Wallpaper Picker |
+| :---: | :---: |
+| ![Control Panel](assets/default_island/control_panel.png) | ![Wallpaper Picker](assets/default_island/wallpaper_picker.png) |
+
+| 💊 Collapsed Clock Pill |
+| :---: |
+| ![Collapsed Pill](assets/default_island/collapsed_pill.png) |
+
+---
+
+## 🧊 Screenshots (MyGlass Mode)
 
 | 🖼️ Cover-Flow Wallpaper Picker | 🕒 Clock & Date Page |
 | :---: | :---: |
