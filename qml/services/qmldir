@@ -1,0 +1,5 @@
+singleton CpuService 1.0 CpuService.qml
+singleton MemService 1.0 MemService.qml
+singleton BatteryService 1.0 BatteryService.qml
+singleton NotificationService 1.0 NotificationService.qml
+singleton VolumeService 1.0 VolumeService.qml

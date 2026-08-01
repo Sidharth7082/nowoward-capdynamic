@@ -1,33 +1,27 @@
 # nowoward-capdynamic
 
-A Dynamic-Island-style widget for Hyprland (Wayland), built with Quickshell +
-QML. One shell process, two coordinated pieces:
+A Dynamic-Island-style widget for Hyprland (Wayland), built with Quickshell + QML. One shell process, two coordinated pieces:
 
-- **The island** — clock pill that expands to show time/date, or a live
-  MPRIS music player (works with Spotify, Brave, or any app exposing MPRIS).
-  Swipe left/right on the expanded capsule to switch pages.
-- **The wallpaper picker** — a PathView cover-flow picker over your
-  `~/Pictures/Wallpapers`, toggled by keybind, that applies wallpapers via
-  `awww`/`mpvpaper`.
+- **The Island** — Clock pill that expands to show:
+  - **Clock & Date page**
+  - **Live MPRIS music player** (Spotify, Brave, mpv, etc.)
+  - **System Monitor page** (Real-time CPU %, RAM %, and Battery gauges)
+  - **Notification Toasts** (Auto-peeks DBus desktop notifications)
+  - **Volume Status Pill** (Transient PipeWire volume overlay)
+  - **Swipe navigation**: Drag left/right on the expanded capsule to cycle pages.
+  - **Hover Reveal**: Hover over the pill to smoothly expand; move mouse away to auto-collapse after 1.5s.
+  - **Smart Auto-Hide when Working**: Automatically slides offscreen when windows are open so it never blocks browser tabs or title bars. Hovering the top-center edge smoothly reveals it.
+- **The Wallpaper Picker** — A PathView cover-flow picker over your `~/Pictures/Wallpapers`, toggled by keybind, that applies wallpapers via `awww`/`mpvpaper`.
 
-They run in the **same process** and coordinate: opening the picker
-collapses the island and suppresses its auto-peek (so a track starting
-mid-picker doesn't pop the island open on top of it).
-
-The island also **hides automatically** when a window on that monitor's
-active workspace enters Hyprland fullscreen (games, fullscreen video, etc.),
-and **collapses after 8 seconds of idle** when expanded (tap, swipe, or
-transport controls reset the timer).
+They run in the **same process** and coordinate: opening the picker hides the island and suppresses auto-peeks.
 
 ## Requirements
 
 - Hyprland (Wayland)
-- [Quickshell](https://quickshell.org/) (`quickshell` on your PATH), with
-  `Quickshell.Services.Mpris` (standard in official builds)
+- [Quickshell](https://quickshell.org/) (`quickshell` on your PATH)
 - `ffmpeg` — wallpaper thumbnail generation
 - `awww` — applying static wallpapers
-- `mpvpaper` — applying video/animated wallpapers (optional, only needed if
-  you use video wallpapers)
+- `mpvpaper` — applying video/animated wallpapers (optional)
 
 ## Run it
 
@@ -45,45 +39,48 @@ exec-once = quickshell -p /path/to/nowoward-capdynamic
 
 ```bash
 # Island
-quickshell ipc call tide toggle   # expand/collapse
-quickshell ipc call tide show     # force expand
-quickshell ipc call tide hide     # force collapse
-quickshell ipc call tide player   # jump to the music player page
-quickshell ipc call tide clock    # jump to the clock page
+quickshell ipc -p /path/to/nowoward-capdynamic call tide toggle   # expand/collapse
+quickshell ipc -p /path/to/nowoward-capdynamic call tide show     # force expand
+quickshell ipc -p /path/to/nowoward-capdynamic call tide hide     # force collapse
+quickshell ipc -p /path/to/nowoward-capdynamic call tide player   # jump to player page
+quickshell ipc -p /path/to/nowoward-capdynamic call tide clock    # jump to clock page
+quickshell ipc -p /path/to/nowoward-capdynamic call tide stats    # jump to stats page
 
 # Wallpaper picker
-quickshell ipc call picker toggle
-quickshell ipc call picker show
-quickshell ipc call picker hide
+quickshell ipc -p /path/to/nowoward-capdynamic call picker toggle
+quickshell ipc -p /path/to/nowoward-capdynamic call picker show
+quickshell ipc -p /path/to/nowoward-capdynamic call picker hide
 ```
 
-Bind the picker to a key in `hyprland.conf`:
+Bind keybindings in `hyprland.conf`:
 
 ```conf
-bind = SUPER, W, exec, quickshell ipc call picker toggle
+bind = SUPER, W, exec, quickshell ipc -p /path/to/nowoward-capdynamic call picker toggle
+bind = SUPER, I, exec, quickshell ipc -p /path/to/nowoward-capdynamic call tide toggle
 ```
 
 ## Structure
 
 ```
-shell.qml                              entry point: IPC handlers for both
-                                        "tide" and "picker", island<->picker
-                                        coordination
-DynamicIslandWindow.qml                the island: capsule geometry,
-                                        animation, mask, page switching,
-                                        MPRIS auto-peek
-qml/island/IslandClock.qml             ticking clock/date source
-qml/island/IslandMprisController.qml   live MPRIS state + transport controls
-qml/island/MusicPlayerLayer.qml        music player page UI
-qml/island/MusicVisualizer.qml         animated visualizer bars
+shell.qml                              Entrypoint & IPC handlers for "tide" and "picker"
+DynamicIslandWindow.qml                Island capsule geometry, animations, mask, hover reveal, smart auto-hide
+qml/theme/
+  Colors.qml                           Color palette definition
+  Theme.qml                            Centralized geometry metrics
+qml/services/
+  CpuService.qml                       /proc/stat CPU monitor
+  MemService.qml                       /proc/meminfo RAM monitor
+  BatteryService.qml                   /sys/class/power_supply Battery monitor
+  NotificationService.qml              DBus Notification server
+  VolumeService.qml                    PipeWire / PulseAudio volume listener
+qml/island/
+  IslandClock.qml                      Clock/date tick source
+  IslandMprisController.qml            MPRIS music state + transport
+  MusicPlayerLayer.qml                 Music player page UI
+  MusicVisualizer.qml                  Animated visualizer bars
+  IslandSystemStats.qml                System monitor gauge UI
+  IslandNotificationLayer.qml          Notification toast alert UI
+  IslandVolumeLayer.qml                Volume indicator UI
 qml/wallpaperpicker/
-  WallpaperPickerPanel.qml             embeddable wallpaper picker (scan,
-                                        thumbnail, cover-flow, apply)
+  WallpaperPickerPanel.qml             Cover-flow wallpaper picker
 ```
-
-## Next steps
-
-- Add `CompositorBackend` (C++) if you want workspace-aware behavior,
-  auto-hide on fullscreen, etc.
-- Add a notification layer.
-- Package with a systemd user service once you're ready to distribute it.

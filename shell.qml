@@ -1,10 +1,18 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "qml/services"
 import "qml/wallpaperpicker"
 
 Scope {
     id: shellRoot
+
+    // Instantiations for global singletons
+    property var _notifService: NotificationService
+    property var _volService: VolumeService
+    property var _cpuService: CpuService
+    property var _memService: MemService
+    property var _batService: BatteryService
 
     function forEachWindow(callback) {
         const windows = panelVariants.instances ? panelVariants.instances : [];
@@ -31,7 +39,7 @@ Scope {
             callback(fallbackWindow);
     }
 
-    // quickshell ipc call tide toggle / show / hide
+    // quickshell ipc call tide toggle / show / hide / player / clock / stats
     IpcHandler {
         target: "tide"
 
@@ -53,6 +61,10 @@ Scope {
 
         function clock() {
             shellRoot.forFocusedWindow((window) => window.showClock());
+        }
+
+        function stats() {
+            shellRoot.forFocusedWindow((window) => window.showStats());
         }
     }
 
