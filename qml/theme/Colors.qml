@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    property color background: "#d9121214"
+    property color background: "#20121216"
     property color border: "#33ffffff"
     property color textPrimary: "#ffffff"
     property color textSecondary: "#aaffffff"

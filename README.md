@@ -14,12 +14,23 @@ git clone https://github.com/Sidharth7082/nowoward-capdynamic.git ~/.config/quic
 
 ---
 
-## 🧊 How to Make the Island Transparent with MyGlass
+## 🧊 How to Enable MyGlass Liquid Glass Mode (Step-by-Step)
 
-If you are using **[MyGlass](https://github.com/Sidharth7082/myglass)** for Apple-style liquid frosted glass effects on Hyprland, follow these simple steps to make the Dynamic Island look like shiny transparent glass:
+Follow these simple steps to turn on **[MyGlass](https://github.com/Sidharth7082/myglass)** Apple-style liquid frosted glass effects on the Dynamic Island:
 
-### 📜 Lua Config (`~/.config/hypr/module/myglass.lua`)
-Add the `nowoward-capdynamic` layer namespace to your `myglass.lua`:
+### 📥 Step 1: Download & Install MyGlass Plugin
+If you haven't installed MyGlass yet, run this single command in your terminal:
+
+```bash
+hyprpm add https://github.com/Sidharth7082/myglass && hyprpm update && hyprpm enable myglass
+```
+
+---
+
+### ⚙️ Step 2: Add Dynamic Island to MyGlass Config
+
+#### Option A: Lua Config (`~/.config/hypr/module/myglass.lua`)
+Add `nowoward-capdynamic` and `nowoward-capdynamic-wallpaperpicker` to your `myglass.lua`:
 
 ```lua
 if hl.plugin and hl.plugin.myglass then
@@ -33,28 +44,34 @@ if hl.plugin and hl.plugin.myglass then
         blur_strength = 0.04,
     })
 
-    -- Enable liquid glass effect on Dynamic Island
+    -- Enable liquid glass effect on Dynamic Island & Wallpaper Picker
     hg.layer("nowoward-capdynamic", { preset = "clear" })
+    hg.layer("nowoward-capdynamic-wallpaperpicker", { preset = "clear" })
 end
 ```
 
-### 📝 Standard Config (`hyprland.conf`)
-If you use legacy `hyprland.conf` instead of Lua:
+#### Option B: Standard Config (`hyprland.conf`)
+If you use legacy `hyprland.conf`:
 
 ```ini
 plugin:myglass {
     default_theme = dark
     default_preset = clear
+    glass_opacity = 0.09
 
     layers {
         enabled = 1
-        namespaces = nowoward-capdynamic
+        namespaces = nowoward-capdynamic, nowoward-capdynamic-wallpaperpicker
         preset = clear
     }
 }
 ```
 
-### 🔄 Reload Hyprland
+---
+
+### 🔄 Step 3: Reload Hyprland
+Reload Hyprland to activate liquid glass mode:
+
 ```bash
 hyprctl reload
 ```
