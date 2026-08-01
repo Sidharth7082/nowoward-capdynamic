@@ -156,12 +156,12 @@ Control the Dynamic Island or Wallpaper Picker from terminal scripts, waybar but
 
 | Action | Command |
 | :--- | :--- |
-| **Toggle Island Expand / Collapse** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle` |
-| **Show Clock Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide clock` |
-| **Show Music Player Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide player` |
-| **Show Control Center Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide stats` |
-| **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide wifi` |
-| **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide bluetooth` |
+| **Toggle Island Expand / Collapse** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle` |
+| **Show Clock Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island clock` |
+| **Show Music Player Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island player` |
+| **Show Control Center Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island stats` |
+| **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island wifi` |
+| **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island bluetooth` |
 | **Toggle Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle` |
 | **Force Show Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker show` |
 | **Force Hide Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker hide` |
@@ -179,7 +179,7 @@ hl.on("hyprland.start", function ()
 end)
 
 -- keybind.lua
-hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle"))
+hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
 ```
 
@@ -190,7 +190,7 @@ hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quicks
 exec-once = quickshell -p ~/.config/quickshell/nowoward-capdynamic
 
 # Keybindings
-bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call tide toggle
+bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle
 bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
 ```
 
@@ -200,7 +200,7 @@ bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-ca
 
 ```
 nowoward-capdynamic/
-├── shell.qml                              # Main entrypoint & IPC handlers ("tide" & "picker")
+├── shell.qml                              # Main entrypoint & IPC handlers ("island" & "picker")
 ├── DynamicIslandWindow.qml                # Capsule geometry, animations, mask, spring physics
 ├── qml/
 │   ├── theme/

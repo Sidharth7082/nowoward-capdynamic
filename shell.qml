@@ -42,9 +42,9 @@ Scope {
             callback(fallbackWindow);
     }
 
-    // quickshell ipc call tide toggle / show / hide / player / clock / stats
+    // quickshell ipc call island toggle / show / hide / player / clock / stats
     IpcHandler {
-        target: "tide"
+        target: "island"
 
         function toggle() {
             shellRoot.forFocusedWindow((window) => window.toggleExpanded());
