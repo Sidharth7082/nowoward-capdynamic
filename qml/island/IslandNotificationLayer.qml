@@ -5,12 +5,30 @@ Item {
     id: root
 
     property var notification: null
-    signal dismissed()
+    signal expansionToggleRequested()
+
+    property bool expanded: false
+
+    readonly property string summaryText: notification ? (notification.summary || notification.appName || "") : ""
+    readonly property string bodyText: notification ? (notification.body || "") : ""
+
+    readonly property string contentText: {
+        if (summaryText !== "" && bodyText !== "" && bodyText !== summaryText)
+            return summaryText + ": " + bodyText;
+        if (summaryText !== "") return summaryText;
+        if (bodyText !== "") return bodyText;
+        return "New Notification";
+    }
 
     anchors.fill: parent
 
     Row {
-        anchors.centerIn: parent
+        id: mainRow
+        anchors.fill: parent
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
         spacing: 10
 
         // Animated Bell Badge
@@ -26,7 +44,7 @@ Item {
                 id: bellIcon
                 anchors.centerIn: parent
                 text: "🔔"
-                font.pixelSize: 13
+                font.pixelSize: 12
                 transformOrigin: Item.Center
 
                 SequentialAnimation {
@@ -42,17 +60,53 @@ Item {
             }
         }
 
-        // Notification Text
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.notification
-                ? ((root.notification.summary ? root.notification.summary : root.notification.appName) || "Notification")
-                : "Notification"
-            color: Theme.text
-            font.pixelSize: 13
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            maximumLineCount: 1
+        // Notification Text Area
+        Item {
+            width: parent.width - 34
+            height: parent.height
+
+            // Compact View
+            Text {
+                visible: !root.expanded
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
+                text: root.contentText
+                color: Theme.text
+                font.pixelSize: 13
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            // Expanded View (Flickable Scrollable Overflow)
+            Flickable {
+                visible: root.expanded
+                anchors.fill: parent
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                contentWidth: width
+                contentHeight: expandedText.implicitHeight
+
+                Text {
+                    id: expandedText
+                    width: parent.width
+                    text: root.contentText
+                    color: Theme.text
+                    font.pixelSize: 12
+                    font.weight: Font.Medium
+                    wrapMode: Text.WordWrap
+                }
+            }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            if (root.bodyText.length > 30 || root.summaryText.length > 30) {
+                root.expanded = !root.expanded;
+                root.expansionToggleRequested();
+            }
         }
     }
 }

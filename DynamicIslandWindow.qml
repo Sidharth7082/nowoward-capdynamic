@@ -115,9 +115,11 @@ PanelWindow {
         root.page = pages[(idx - 1 + pages.length) % pages.length];
     }
 
+    property bool notifExpanded: false
+
     // Dynamic width & height calculation
     readonly property int targetWidth: peekingNotif
-        ? Theme.notificationWidth
+        ? (root.notifExpanded ? 340 : Theme.notificationWidth)
         : (peekingVolume
             ? 240
             : (!root.expanded
@@ -135,7 +137,7 @@ PanelWindow {
                                     : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth))))))))
 
     readonly property int targetHeight: peekingNotif
-        ? Theme.notificationHeight
+        ? (root.notifExpanded ? 90 : Theme.notificationHeight)
         : (peekingVolume
             ? 40
             : (!root.expanded
@@ -472,8 +474,11 @@ PanelWindow {
         IslandNotificationLayer {
             anchors.fill: parent
             notification: root.activeNotification
+            expanded: root.notifExpanded
             opacity: root.peekingNotif ? 1 : 0
             visible: opacity > 0.01
+
+            onExpansionToggleRequested: root.notifExpanded = !root.notifExpanded
 
             Behavior on opacity { NumberAnimation { duration: 180 } }
         }
