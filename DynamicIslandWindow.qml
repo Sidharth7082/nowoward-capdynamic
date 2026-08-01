@@ -343,19 +343,19 @@ PanelWindow {
         }
 
         Behavior on y {
-            NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
         }
         Behavior on opacity {
-            NumberAnimation { duration: 250; easing.type: Easing.OutQuad }
+            NumberAnimation { duration: 160; easing.type: Easing.OutQuad }
         }
         Behavior on width {
-            NumberAnimation { duration: 350; easing.type: Easing.OutBack }
+            NumberAnimation { duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.12 }
         }
         Behavior on height {
-            NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
         }
         Behavior on radius {
-            NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
         }
 
         MouseArea {
@@ -496,10 +496,10 @@ PanelWindow {
                 anchors.centerIn: parent
                 spacing: 4
                 opacity: root.page === "clock" ? 1 : 0
-                scale: root.page === "clock" ? 1 : 0.92
+                scale: root.page === "clock" ? 1 : 0.95
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -523,11 +523,11 @@ PanelWindow {
                 controller: mpris
                 userActivityCallback: root.notifyActivity
                 opacity: root.page === "player" ? 1 : 0
-                scale: root.page === "player" ? 1 : 0.92
+                scale: root.page === "player" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
 
             // Page 3: System Stats / Control Center
@@ -535,13 +535,13 @@ PanelWindow {
                 id: statsPage
                 anchors.fill: parent
                 opacity: root.page === "stats" ? 1 : 0
-                scale: root.page === "stats" ? 1 : 0.92
+                scale: root.page === "stats" ? 1 : 0.95
                 visible: opacity > 0.01
 
                 onWifiRightClicked: root.showWifi()
                 onBtRightClicked: root.showBluetooth()
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
 
             // Page 4: Notification History Center
@@ -549,11 +549,11 @@ PanelWindow {
                 id: notifsPage
                 anchors.fill: parent
                 opacity: root.page === "notifs" ? 1 : 0
-                scale: root.page === "notifs" ? 1 : 0.92
+                scale: root.page === "notifs" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
 
             // Page 5: Quick App Launcher
@@ -561,11 +561,11 @@ PanelWindow {
                 id: appsPage
                 anchors.fill: parent
                 opacity: root.page === "apps" ? 1 : 0
-                scale: root.page === "apps" ? 1 : 0.92
+                scale: root.page === "apps" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
 
             // Page 6: Wi-Fi Detail Page
@@ -573,13 +573,13 @@ PanelWindow {
                 id: wifiPage
                 anchors.fill: parent
                 opacity: root.page === "wifi" ? 1 : 0
-                scale: root.page === "wifi" ? 1 : 0.92
+                scale: root.page === "wifi" ? 1 : 0.95
                 visible: opacity > 0.01
 
                 onBackClicked: root.showStats()
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
 
             // Page 7: Bluetooth Detail Page
@@ -587,13 +587,13 @@ PanelWindow {
                 id: btPage
                 anchors.fill: parent
                 opacity: root.page === "bluetooth" ? 1 : 0
-                scale: root.page === "bluetooth" ? 1 : 0.92
+                scale: root.page === "bluetooth" ? 1 : 0.95
                 visible: opacity > 0.01
 
                 onBackClicked: root.showStats()
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutQuad } }
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
         }
 
