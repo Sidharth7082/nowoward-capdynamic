@@ -13,6 +13,9 @@ Scope {
     property var _cpuService: CpuService
     property var _memService: MemService
     property var _batService: BatteryService
+    property var _brightService: BrightnessService
+    property var _netService: NetworkService
+    property var _btService: BluetoothService
 
     function forEachWindow(callback) {
         const windows = panelVariants.instances ? panelVariants.instances : [];

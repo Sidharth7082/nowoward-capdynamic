@@ -19,6 +19,19 @@ QtObject {
         }
     }
 
+    property var _setProc: Process {
+        command: []
+        running: false
+    }
+
+    function setVolume(percent) {
+        let p = Math.min(100, Math.max(0, Math.round(percent)));
+        root.volume = p;
+        root._setProc.command = ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (p / 100.0).toFixed(2)];
+        root._setProc.running = false;
+        root._setProc.running = true;
+    }
+
     property var _timer: Timer {
         interval: 2000
         running: true

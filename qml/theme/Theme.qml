@@ -15,8 +15,8 @@ QtObject {
     readonly property int clockHeight: 92
     readonly property int playerWidth: 300
     readonly property int playerHeight: 150
-    readonly property int statsWidth: 300
-    readonly property int statsHeight: 150
+    readonly property int statsWidth: 330
+    readonly property int statsHeight: 195
     readonly property int notificationWidth: 320
     readonly property int notificationHeight: 96
 }
