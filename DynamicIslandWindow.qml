@@ -418,6 +418,8 @@ PanelWindow {
             id: pageHost
             anchors.fill: parent
             opacity: (root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
+            visible: opacity > 0.01
+            enabled: root.expanded && opacity > 0.5
 
             Behavior on opacity {
                 NumberAnimation { duration: 220; easing.type: Easing.InOutQuad }
