@@ -134,7 +134,7 @@ PanelWindow {
     anchors { top: true; left: true; right: true }
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "tide-mini"
+    WlrLayershell.namespace: "nowoward-capdynamic"
     exclusiveZone: 0
 
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
