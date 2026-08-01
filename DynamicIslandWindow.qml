@@ -246,7 +246,6 @@ PanelWindow {
             if (!root.suppressPeek && !root.hideForFullscreen) {
                 root.activeNotification = n;
                 root.peekingNotif = true;
-                root.setExpanded(true);
                 notifTimer.restart();
             }
         }
