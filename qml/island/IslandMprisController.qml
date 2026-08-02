@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Io
 import Quickshell.Services.Mpris
 
 // Picks whichever MPRIS player should be "active" (prefers one that's
@@ -54,20 +55,42 @@ Item {
         activePlayer = list[0];
     }
 
+    Process {
+        id: playerctlProc
+        running: false
+    }
+
     function playPause() {
-        if (!activePlayer) return;
-        if (activePlayer.playbackState === MprisPlaybackState.Playing)
-            activePlayer.pause();
-        else
-            activePlayer.play();
+        if (activePlayer) {
+            try { activePlayer.playPause(); } catch(e) {}
+            try {
+                if (activePlayer.playbackState === MprisPlaybackState.Playing)
+                    activePlayer.pause();
+                else
+                    activePlayer.play();
+            } catch(e) {}
+        }
+        playerctlProc.command = ["playerctl", "play-pause"];
+        playerctlProc.running = false;
+        playerctlProc.running = true;
     }
 
     function next() {
-        if (activePlayer && activePlayer.canGoNext) activePlayer.next();
+        if (activePlayer) {
+            try { activePlayer.next(); } catch(e) {}
+        }
+        playerctlProc.command = ["playerctl", "next"];
+        playerctlProc.running = false;
+        playerctlProc.running = true;
     }
 
     function previous() {
-        if (activePlayer && activePlayer.canGoPrevious) activePlayer.previous();
+        if (activePlayer) {
+            try { activePlayer.previous(); } catch(e) {}
+        }
+        playerctlProc.command = ["playerctl", "previous"];
+        playerctlProc.running = false;
+        playerctlProc.running = true;
     }
 
     Connections {

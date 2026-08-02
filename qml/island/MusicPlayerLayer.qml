@@ -167,14 +167,14 @@ Item {
 
             Text {
                 text: "⏮"
-                color: mpris.canGoPrevious ? "white" : "#555555"
+                color: mpris && mpris.hasPlayer ? "white" : "#777777"
                 font.pixelSize: 18
                 MouseArea {
                     anchors.fill: parent
                     anchors.margins: -8
-                    enabled: mpris.canGoPrevious
+                    cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mpris.previous();
+                        if (mpris) mpris.previous();
                         root.notifyUserActivity();
                     }
                 }
@@ -188,8 +188,8 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    anchors.horizontalCenterOffset: mpris.playing ? 0 : 1
-                    text: mpris.playing ? "⏸" : "▶"
+                    anchors.horizontalCenterOffset: (mpris && mpris.playing) ? 0 : 1
+                    text: (mpris && mpris.playing) ? "⏸" : "▶"
                     color: "black"
                     font.pixelSize: 14
                 }
@@ -198,7 +198,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mpris.playPause();
+                        if (mpris) mpris.playPause();
                         root.notifyUserActivity();
                     }
                 }
@@ -206,14 +206,14 @@ Item {
 
             Text {
                 text: "⏭"
-                color: mpris.canGoNext ? "white" : "#555555"
+                color: mpris && mpris.hasPlayer ? "white" : "#777777"
                 font.pixelSize: 18
                 MouseArea {
                     anchors.fill: parent
                     anchors.margins: -8
-                    enabled: mpris.canGoNext
+                    cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mpris.next();
+                        if (mpris) mpris.next();
                         root.notifyUserActivity();
                     }
                 }
