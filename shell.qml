@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import "qml/services"
 import "qml/wallpaperpicker"
+import "qml/wlogout"
 
 Scope {
     id: shellRoot
@@ -43,7 +44,7 @@ Scope {
             callback(fallbackWindow);
     }
 
-    // quickshell ipc call island toggle / show / hide / player / clock / stats
+    // quickshell ipc call island toggle / show / hide / player / clock / stats / logout
     IpcHandler {
         target: "island"
 
@@ -82,6 +83,10 @@ Scope {
         function bluetooth() {
             shellRoot.forFocusedWindow((window) => window.showBluetooth());
         }
+
+        function logout() {
+            shellRoot.forFocusedWindow((window) => window.showLogout());
+        }
     }
 
     // quickshell ipc call picker toggle / show / hide
@@ -91,6 +96,19 @@ Scope {
         function toggle() { wallpaperPicker.toggle(); }
         function show() { wallpaperPicker.show(); }
         function hide() { wallpaperPicker.hide(); }
+    }
+
+    // quickshell ipc call wlogout toggle / show / hide
+    IpcHandler {
+        target: "wlogout"
+
+        function toggle() { wlogoutPanel.toggle(); }
+        function show() { wlogoutPanel.show(); }
+        function hide() { wlogoutPanel.hide(); }
+    }
+
+    WLogoutPanel {
+        id: wlogoutPanel
     }
 
     WallpaperPickerPanel {

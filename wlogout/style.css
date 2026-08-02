@@ -1,0 +1,65 @@
+* {
+    background-image: none;
+    box-shadow: none;
+}
+
+window {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+grid {
+    margin-top: 16px;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: rgba(14, 19, 24, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 26px;
+    padding: 10px 14px;
+}
+
+button {
+    border-radius: 18px;
+    color: #e6edf3;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid transparent;
+    background-repeat: no-repeat;
+    background-position: center 25%;
+    background-size: 28px;
+    margin: 4px 5px;
+    min-width: 90px;
+    min-height: 82px;
+    padding-top: 48px;
+    padding-bottom: 10px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background-color 0.18s ease-in-out, color 0.18s ease-in-out, border-color 0.18s ease-in-out;
+}
+
+button:focus, button:hover {
+    background-color: #59b2c6;
+    color: #0c1014;
+    border-color: #64c5d9;
+    outline: none;
+}
+
+#lock {
+    background-image: image(url("icons/lock.svg"));
+}
+
+#suspend {
+    background-image: image(url("icons/suspend.svg"));
+}
+
+#logout {
+    background-image: image(url("icons/logout.svg"));
+}
+
+#reboot {
+    background-image: image(url("icons/reboot.svg"));
+}
+
+#shutdown {
+    background-image: image(url("icons/shutdown.svg"));
+}

@@ -23,4 +23,6 @@ QtObject {
     readonly property int btHeight: 220
     readonly property int notificationWidth: 240
     readonly property int notificationHeight: 38
+    readonly property int logoutWidth: 540
+    readonly property int logoutHeight: 104
 }

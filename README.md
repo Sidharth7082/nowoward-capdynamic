@@ -163,6 +163,8 @@ Control the Dynamic Island or Wallpaper Picker from terminal scripts, waybar but
 | **Show Notification History** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs` |
 | **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island wifi` |
 | **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island bluetooth` |
+| **Show Logout Menu (Island)** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island logout` |
+| **Toggle WLogout Overlay** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle` |
 | **Toggle Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle` |
 | **Force Show Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker show` |
 | **Force Hide Wallpaper Picker** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker hide` |
@@ -182,6 +184,7 @@ end)
 -- keybind.lua
 hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs"))
+hl.bind("SUPER + L", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
 ```
 
@@ -194,6 +197,7 @@ exec-once = quickshell -p ~/.config/quickshell/nowoward-capdynamic
 # Keybindings
 bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle
 bind = SUPER, N, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs
+bind = SUPER, L, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle
 bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
 ```
 
@@ -203,8 +207,14 @@ bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-ca
 
 ```
 nowoward-capdynamic/
-├── shell.qml                              # Main entrypoint & IPC handlers ("island" & "picker")
+├── shell.qml                              # Main entrypoint & IPC handlers ("island", "picker", "wlogout")
 ├── DynamicIslandWindow.qml                # Capsule geometry, animations, mask, spring physics
+├── wlogout/                               # Custom wlogout theme & configuration
+│   ├── layout                             # wlogout button actions & keybindings
+│   ├── style.css                          # Custom top-capsule GTK stylesheet
+│   ├── launch.sh                          # Direct launch script for GTK wlogout
+│   ├── install.sh                         # Install theme to ~/.config/wlogout
+│   └── icons/                             # SVG action icons (lock, suspend, logout, reboot, shutdown)
 ├── qml/
 │   ├── theme/
 │   │   ├── Colors.qml                     # Translucent glass color tokens
@@ -227,7 +237,10 @@ nowoward-capdynamic/
 │   │   ├── IslandWifiLayer.qml            # Dedicated Wi-Fi sub-page UI
 │   │   ├── IslandBluetoothLayer.qml       # Dedicated Bluetooth sub-page UI
 │   │   ├── IslandNotificationLayer.qml    # Notification toast UI
-│   │   └── IslandVolumeLayer.qml          # Volume overlay UI
+│   │   ├── IslandVolumeLayer.qml          # Volume overlay UI
+│   │   └── IslandLogoutLayer.qml          # Dynamic Island Logout sub-page UI
+│   ├── wlogout/
+│   │   └── WLogoutPanel.qml               # Standalone top-capsule Logout overlay window
 │   └── wallpaperpicker/
 │       └── WallpaperPickerPanel.qml       # Cover-flow wallpaper browser
 └── assets/

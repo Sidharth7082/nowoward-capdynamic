@@ -102,6 +102,7 @@ PanelWindow {
     function showNotifs() { setExpanded(true); page = "notifs"; notifyActivity(); }
     function showWifi() { setExpanded(true); page = "wifi"; notifyActivity(); }
     function showBluetooth() { setExpanded(true); page = "bluetooth"; notifyActivity(); }
+    function showLogout() { setExpanded(true); page = "logout"; notifyActivity(); }
 
     function nextPage() {
         const idx = pages.indexOf(root.page);
@@ -131,7 +132,9 @@ PanelWindow {
                             ? 360
                             : (root.page === "wifi"
                                 ? Theme.wifiWidth
-                                : (root.page === "bluetooth" ? Theme.btWidth : Theme.clockWidth)))))))
+                                : (root.page === "bluetooth"
+                                    ? Theme.btWidth
+                                    : (root.page === "logout" ? Theme.logoutWidth : Theme.clockWidth))))))))
 
     readonly property int targetHeight: peekingNotif
         ? (root.notifExpanded ? 90 : Theme.notificationHeight)
@@ -147,7 +150,9 @@ PanelWindow {
                             ? 220
                             : (root.page === "wifi"
                                 ? Theme.wifiHeight
-                                : (root.page === "bluetooth" ? Theme.btHeight : Theme.clockHeight)))))))
+                                : (root.page === "bluetooth"
+                                    ? Theme.btHeight
+                                    : (root.page === "logout" ? Theme.logoutHeight : Theme.clockHeight))))))))
 
     color: "transparent"
     anchors { top: true; left: true; right: true }
@@ -578,6 +583,20 @@ PanelWindow {
                 visible: opacity > 0.01
 
                 onBackClicked: root.showStats()
+
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+            }
+
+            // Page 8: Logout / wlogout Page
+            IslandLogoutLayer {
+                id: logoutPage
+                anchors.fill: parent
+                opacity: root.page === "logout" ? 1 : 0
+                scale: root.page === "logout" ? 1 : 0.95
+                visible: opacity > 0.01
+
+                onActionTriggered: root.setExpanded(false)
 
                 Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
                 Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }

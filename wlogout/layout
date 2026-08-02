@@ -1,0 +1,30 @@
+{
+    "label" : "lock",
+    "action" : "hyprlock || swaylock || loginctl lock-session",
+    "text" : "Lock",
+    "keybind" : "l"
+}
+{
+    "label" : "suspend",
+    "action" : "systemctl suspend",
+    "text" : "Suspend",
+    "keybind" : "u"
+}
+{
+    "label" : "logout",
+    "action" : "hyprctl dispatch exit || loginctl terminate-user $USER",
+    "text" : "Log Out",
+    "keybind" : "e"
+}
+{
+    "label" : "reboot",
+    "action" : "systemctl reboot",
+    "text" : "Reboot",
+    "keybind" : "r"
+}
+{
+    "label" : "shutdown",
+    "action" : "systemctl poweroff",
+    "text" : "Power Off",
+    "keybind" : "s"
+}
