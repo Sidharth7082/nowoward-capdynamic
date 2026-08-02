@@ -4,6 +4,7 @@ import Quickshell.Io
 import "qml/services"
 import "qml/wallpaperpicker"
 import "qml/wlogout"
+import "qml/theme"
 
 Scope {
     id: shellRoot

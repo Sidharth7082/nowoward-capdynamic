@@ -331,13 +331,16 @@ PanelWindow {
         opacity: root.shouldHidePill ? 0 : 1
         width: root.targetWidth
         height: root.targetHeight
-        radius: (root.expanded || root.peekingNotif) ? 26 : height / 2
-        color: Theme.bg
-        border.color: Theme.border
+        color: Theme.isMyGlass ? "#1a121216" : "#f20d1117"
+        border.color: Theme.isMyGlass ? "#33ffffff" : "#50ffffff"
         border.width: 1
         clip: true
         scale: gestureArea.containsPress ? 0.975 : (gestureArea.containsMouse ? 1.012 : 1.0)
         transformOrigin: Item.Center
+
+        Behavior on color {
+            ColorAnimation { duration: 200 }
+        }
 
         Behavior on scale {
             NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
