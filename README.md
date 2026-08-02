@@ -94,6 +94,24 @@ To turn OFF liquid glass mode and revert back to solid translucent dark capsules
 
 ---
 
+### 🔀 Instant 1-Key Toggle (`SUPER + SHIFT + G`)
+
+To easily switch back and forth between **MyGlass (Liquid Glass)** and **Default Island Mode** at any time:
+
+Add this keybinding to your Hyprland configuration (`~/.config/hypr/module/keybind.lua`):
+
+```lua
+-- Toggle MyGlass Liquid Glass vs Default Island Mode
+hl.bind("SUPER + SHIFT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_myglass.sh"))
+```
+
+Or for `hyprland.conf`:
+```ini
+bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
+```
+
+---
+
 ## 🖼️ Visual Showcase
 
 <div align="center">
@@ -203,6 +221,7 @@ hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/now
 hl.bind("SUPER + N", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs"))
 hl.bind("SUPER + L", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
+hl.bind("SUPER + SHIFT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_myglass.sh"))
 ```
 
 ### 📝 Legacy Setup (`hyprland.conf`)
@@ -216,6 +235,7 @@ bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynami
 bind = SUPER, N, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs
 bind = SUPER, L, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle
 bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
+bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 ```
 
 ---
