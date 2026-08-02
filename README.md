@@ -165,6 +165,7 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | **🔊 Transient Volume Overlay** | Displays a sleek audio level indicator pill whenever hardware volume keys are pressed. |
 | **🎯 Top-Edge Sensor** | Remains 100% hidden offscreen until pointer touches top monitor edge. |
 | **🙈 Window Auto-Hide** | Hides automatically when active workspace windows are present to keep titlebars and browser tabs clear. |
+| **🎨 Apple-Style Emoji Picker** | Built-in 1800+ Unicode 16.0 emoji grid with category tabs, live search input, recent list, and 1-click `wl-copy` clipboard integration (`SUPER + SHIFT + E`). |
 | **🖼️ Cover-Flow Wallpaper Browser** | Smooth PathView wallpaper carousel with `ffmpeg` thumbnail caching and `awww` / `mpvpaper` backends. |
 
 ---

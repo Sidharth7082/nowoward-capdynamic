@@ -156,6 +156,7 @@ quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs
 quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island wifi
 quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island bluetooth
 quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island logout
+quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island emojis
 
 # Mode Switcher (Default vs MyGlass)
 quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call theme defaultMode

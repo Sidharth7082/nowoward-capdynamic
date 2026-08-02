@@ -88,6 +88,10 @@ Scope {
         function logout() {
             shellRoot.forFocusedWindow((window) => window.showLogout());
         }
+
+        function emojis() {
+            shellRoot.forFocusedWindow((window) => window.showEmojis());
+        }
     }
 
     // quickshell ipc call picker toggle / show / hide
