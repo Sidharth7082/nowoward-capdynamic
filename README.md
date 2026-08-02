@@ -9,6 +9,7 @@
 [![Hyprland](https://img.shields.io/badge/Compositor-Hyprland-blue?style=for-the-badge&logo=archlinux&logoColor=white)](https://hyprland.org)
 [![Quickshell](https://img.shields.io/badge/Framework-Quickshell%20%2B%20QML-8a2be2?style=for-the-badge)](https://quickshell.org)
 [![MyGlass](https://img.shields.io/badge/Plugin-MyGlass%20Supported-00f2fe?style=for-the-badge)](https://github.com/Sidharth7082/myglass)
+[![FAQ](https://img.shields.io/badge/Documentation-FAQ%20%26%20Guide-FF4500?style=for-the-badge&logo=bookstack&logoColor=white)](FAQ.md)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 </div>
