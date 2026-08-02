@@ -25,14 +25,15 @@ Item {
     })
 
     property var filteredEmojis: {
+        const dummy = EmojiService.count;
         const query = root.searchText.trim().toLowerCase();
         if (query.length > 0) {
-            return EmojiService.allEmojis.filter(e => e.name && e.name.toLowerCase().includes(query)).slice(0, 80);
+            return EmojiService.allEmojis.filter(e => e.name && e.name.toLowerCase().includes(query)).slice(0, 120);
         }
         if (root.currentCategory === "Recent") {
             return EmojiService.recentEmojis;
         }
-        return EmojiService.allEmojis.filter(e => e.category === root.currentCategory).slice(0, 100);
+        return EmojiService.allEmojis.filter(e => e.category === root.currentCategory || (e.category && e.category.indexOf(root.currentCategory) >= 0)).slice(0, 150);
     }
 
     Column {
