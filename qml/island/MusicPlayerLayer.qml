@@ -171,8 +171,10 @@ Item {
                 font.pixelSize: 18
                 MouseArea {
                     anchors.fill: parent
-                    anchors.margins: -8
+                    anchors.margins: -12
                     cursorShape: Qt.PointingHandCursor
+                    preventStealing: true
+                    onPressed: function(mouse) { mouse.accepted = true; }
                     onClicked: {
                         if (mpris) mpris.previous();
                         root.notifyUserActivity();
@@ -197,6 +199,8 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
+                    preventStealing: true
+                    onPressed: function(mouse) { mouse.accepted = true; }
                     onClicked: {
                         if (mpris) mpris.playPause();
                         root.notifyUserActivity();
@@ -210,8 +214,10 @@ Item {
                 font.pixelSize: 18
                 MouseArea {
                     anchors.fill: parent
-                    anchors.margins: -8
+                    anchors.margins: -12
                     cursorShape: Qt.PointingHandCursor
+                    preventStealing: true
+                    onPressed: function(mouse) { mouse.accepted = true; }
                     onClicked: {
                         if (mpris) mpris.next();
                         root.notifyUserActivity();

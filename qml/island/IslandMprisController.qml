@@ -55,42 +55,25 @@ Item {
         activePlayer = list[0];
     }
 
-    Process {
-        id: playerctlProc
-        running: false
-    }
-
     function playPause() {
-        if (activePlayer) {
-            try { activePlayer.playPause(); } catch(e) {}
-            try {
-                if (activePlayer.playbackState === MprisPlaybackState.Playing)
-                    activePlayer.pause();
-                else
-                    activePlayer.play();
-            } catch(e) {}
+        if (!activePlayer) return;
+        if (activePlayer.togglePlaying) {
+            activePlayer.togglePlaying();
+        } else if (activePlayer.playbackState === MprisPlaybackState.Playing) {
+            activePlayer.pause();
+        } else {
+            activePlayer.play();
         }
-        playerctlProc.command = ["playerctl", "play-pause"];
-        playerctlProc.running = false;
-        playerctlProc.running = true;
     }
 
     function next() {
-        if (activePlayer) {
-            try { activePlayer.next(); } catch(e) {}
-        }
-        playerctlProc.command = ["playerctl", "next"];
-        playerctlProc.running = false;
-        playerctlProc.running = true;
+        if (activePlayer)
+            activePlayer.next();
     }
 
     function previous() {
-        if (activePlayer) {
-            try { activePlayer.previous(); } catch(e) {}
-        }
-        playerctlProc.command = ["playerctl", "previous"];
-        playerctlProc.running = false;
-        playerctlProc.running = true;
+        if (activePlayer)
+            activePlayer.previous();
     }
 
     Connections {
