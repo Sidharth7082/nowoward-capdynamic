@@ -207,9 +207,13 @@ Item {
             width: 1100
             height: 210
             radius: 20
-            color: Colors.background
-            border.color: Colors.border
+            color: Theme.isMyGlass ? "#1a121216" : "#f20d1117"
+            border.color: Theme.isMyGlass ? "#33ffffff" : "#50ffffff"
             border.width: 1
+
+            Behavior on color {
+                ColorAnimation { duration: 200 }
+            }
 
             focus: root.shown
             Keys.onEscapePressed: root.hide()
