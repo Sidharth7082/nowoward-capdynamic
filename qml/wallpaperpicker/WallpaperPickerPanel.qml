@@ -148,17 +148,23 @@ Item {
 
     // ── Apply wallpaper ────────────────────────────────────────────────
     Process { id: killMpvpaper; command: ["pkill", "-x", "mpvpaper"] }
-    Process { id: applyImage; property string path: ""; command: ["awww", "img", path] }
-    Process { id: applyVideo; property string path: ""; command: ["mpvpaper", "-o", "--loop --mute", "*", path] }
+    Process { id: applyImage }
+    Process { id: applyVideo }
 
     function applyWallpaper(item) {
+        if (!item || !item.filePath) return;
         root.activeWallpaper = item.filePath;
+
+        killMpvpaper.running = false;
         killMpvpaper.running = true;
+
         if (item.isVideo) {
-            applyVideo.path = item.filePath;
+            applyVideo.running = false;
+            applyVideo.command = ["mpvpaper", "-o", "--loop --mute", "*", item.filePath];
             applyVideo.running = true;
         } else {
-            applyImage.path = item.filePath;
+            applyImage.running = false;
+            applyImage.command = ["sh", "-c", "awww img \"$1\" || swww img \"$1\" || hyprctl hyprpaper wallpaper \",$1\"", "--", item.filePath];
             applyImage.running = true;
         }
     }
