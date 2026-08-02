@@ -10,7 +10,7 @@ QtObject {
     readonly property var monitor: Hyprland.focusedMonitor
     readonly property int activeWorkspaceId: monitor && monitor.activeWorkspace ? Math.max(1, monitor.activeWorkspace.id) : 1
 
-    property string activeWallpaper: "/home/capture/Pictures/Wallpapers/Angel_Warrior.jpg"
+    property string activeWallpaper: (Quickshell.env("HOME") || "") + "/Pictures/Wallpapers/Angel_Warrior.jpg"
     property var windowsByWorkspace: ({})
 
     property var _wallpaperProc: Process {

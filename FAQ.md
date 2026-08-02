@@ -116,7 +116,7 @@ git clone https://github.com/Sidharth7082/nowoward-capdynamic.git ~/.config/quic
 * **Direct Hotkeys:**
   * **`L`** / `1` ➡️ Lock (`hyprlock`)
   * **`U`** / `2` ➡️ Suspend (`systemctl suspend`)
-  * **`E`** / `3` ➡️ Log Out (`hyprctl dispatch exit`)
+  * **`E`** / `3` ➡️ Log Out (`hyprctl dispatch exit || swaymsg exit || loginctl terminate-session self`)
   * **`R`** / `4` ➡️ Reboot (`systemctl reboot`)
   * **`S`** / `5` ➡️ Power Off (`systemctl poweroff`)
   * **`Esc`** / `Q` ➡️ Close

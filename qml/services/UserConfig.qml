@@ -7,7 +7,7 @@ QtObject {
 
     property string textFontFamily: "Sans"
     property string heroFontFamily: "Sans"
-    readonly property string wallpaperPath: WorkspaceService.activeWallpaper || "/home/capture/Pictures/Wallpapers/Angel_Warrior.jpg"
+    readonly property string wallpaperPath: WorkspaceService.activeWallpaper || ((Quickshell.env("HOME") || "") + "/Pictures/Wallpapers/Angel_Warrior.jpg")
     property var workspaceOverviewWindowDragButton: "left"
     property var dynamicIslandPrimaryButton: "left"
     property var dynamicIslandSecondaryButton: "right"

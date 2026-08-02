@@ -90,7 +90,7 @@ FocusScope {
 
     Process {
         id: procLogout
-        command: ["sh", "-c", "hyprctl dispatch exit || loginctl terminate-user $USER"]
+        command: ["sh", "-c", "hyprctl dispatch exit || swaymsg exit || loginctl terminate-session ${XDG_SESSION_ID:-self}"]
     }
 
     Process {

@@ -91,7 +91,7 @@ Item {
     }
 
     // ── Parallel Thumbnail Generation Engine ──────────────────────────────
-    property string genScript: (Quickshell.env("HOME") || "/home/capture") + "/Downloads/nowoward-capdynamic/scripts/gen_thumbs.sh"
+    property string genScript: Qt.resolvedUrl("../../scripts/gen_thumbs.sh").replace("file://", "")
 
     Process {
         id: bgThumbGen
