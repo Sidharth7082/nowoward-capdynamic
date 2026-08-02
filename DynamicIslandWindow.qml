@@ -165,8 +165,8 @@ PanelWindow {
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "nowoward-capdynamic"
-    WlrLayershell.keyboardFocus: (root.expanded && (root.page === "emojis" || root.page === "logout"))
-        ? WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: root.expanded
+        ? (root.page === "emojis" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
     exclusiveZone: 0
 
