@@ -444,6 +444,7 @@ PanelWindow {
         Text {
             anchors.centerIn: parent
             opacity: (!root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
+            visible: opacity > 0.01
             text: clock.timeText
             color: Theme.text
             font.pixelSize: 15
@@ -505,6 +506,7 @@ PanelWindow {
                 spacing: 4
                 opacity: root.page === "clock" ? 1 : 0
                 scale: root.page === "clock" ? 1 : 0.95
+                visible: opacity > 0.01
 
                 Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
                 Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
