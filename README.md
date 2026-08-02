@@ -126,9 +126,9 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | :---: | :---: |
 | ![Control Center](assets/default_island/control_panel.png) | ![Wallpaper Picker](assets/default_island/wallpaper_picker.png) |
 
-| 💊 Collapsed Clock Pill |
-| :---: |
-| ![Collapsed Pill](assets/default_island/collapsed_pill.png) |
+| 💊 Collapsed Clock Pill | 🚪 Top WLogout Overlay |
+| :---: | :---: |
+| ![Collapsed Pill](assets/default_island/collapsed_pill.png) | ![WLogout Panel Default Mode](assets/default_island/wlogout.png) |
 
 ---
 
@@ -142,9 +142,9 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | :---: | :---: |
 | ![Music Player](assets/myglass_on_island/music_page.png) | ![Control Center](assets/myglass_on_island/control_panel.png) |
 
-| 💊 Collapsed Clock Pill |
-| :---: |
-| ![Collapsed Pill](assets/myglass_on_island/collapsed_pill.png) |
+| 💊 Collapsed Clock Pill | 🚪 Top WLogout Overlay |
+| :---: | :---: |
+| ![Collapsed Pill](assets/myglass_on_island/collapsed_pill.png) | ![WLogout Panel MyGlass Mode](assets/myglass_on_island/wlogout.png) |
 
 </div>
 
