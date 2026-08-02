@@ -38,37 +38,37 @@ QtObject {
     }
 
     property var _proc: Process {
-        id: proc
-        command: ["sh", "-c", "cap=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n 1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n 1); echo \"$cap|$stat\""]
+        command: ["sh", "-c", "cap=$(cat /sys/class/power_supply/BAT0/capacity /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n 1); stat=$(cat /sys/class/power_supply/BAT0/status /sys/class/power_supply/BAT*/status 2>/dev/null | head -n 1); echo \"$cap|$stat\""]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: (text) => {
-                if (!text) return;
-                const parts = text.trim().split("|");
-                if (parts.length >= 1) {
-                    const val = parseInt(parts[0]);
-                    if (!isNaN(val)) {
-                        root.present = true;
-                        root.percentage = val;
-                    }
-                }
-                if (parts.length >= 2) {
-                    const st = parts[1].toLowerCase();
-                    root.charging = (st === "charging" || st === "full");
-                }
-            }
+            onStreamFinished: root._parse(text)
         }
     }
 
     property var _timer: Timer {
-        interval: 2500
+        interval: 2000
         running: root.active
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            if (!proc.running) {
-                proc.running = true;
+            root._proc.running = false
+            root._proc.running = true
+        }
+    }
+
+    function _parse(text) {
+        if (!text) return
+        var parts = text.trim().split("|")
+        if (parts.length >= 1) {
+            var val = parseInt(parts[0])
+            if (!isNaN(val) && val > 0) {
+                root.present = true
+                root.percentage = val
             }
+        }
+        if (parts.length >= 2) {
+            var st = parts[1].toLowerCase()
+            root.charging = (st === "charging" || st === "full")
         }
     }
 }
