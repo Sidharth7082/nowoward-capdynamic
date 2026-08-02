@@ -58,12 +58,14 @@ Item {
                 .sort((a, b) => a.localeCompare(b))
                 .map(p => {
                     const ext = p.substring(p.lastIndexOf(".") + 1);
+                    const isVid = root.videoExts.indexOf(ext) >= 0;
                     return {
                         filePath: p,
                         fileName: p.substring(p.lastIndexOf("/") + 1),
-                        isVideo: root.videoExts.indexOf(ext) >= 0,
+                        isVideo: isVid,
                         cachePath: root.cacheDir + "/" + Qt.md5(p) + ".jpg",
-                        thumbReady: false
+                        thumbPath: isVid ? (root.cacheDir + "/" + Qt.md5(p) + ".jpg") : ("file://" + p),
+                        thumbReady: !isVid
                     };
                 });
 
@@ -73,8 +75,10 @@ Item {
 
             if (wallpapers.count > 0) {
                 carousel.currentIndex = 0;
-                for (let i = 0; i < wallpapers.count; i++)
-                    ensureThumbnail(i);
+                for (let i = 0; i < wallpapers.count; i++) {
+                    if (wallpapers.get(i).isVideo)
+                        ensureThumbnail(i);
+                }
             }
         }
     }
@@ -164,7 +168,7 @@ Item {
             applyVideo.running = true;
         } else {
             applyImage.running = false;
-            applyImage.command = ["sh", "-c", "awww img \"$1\" || swww img \"$1\" || hyprctl hyprpaper wallpaper \",$1\"", "--", item.filePath];
+            applyImage.command = ["sh", "-c", "awww img \"$1\" --transition-type outer --transition-step 255 --transition-fps 144 || swww img \"$1\" || hyprctl hyprpaper wallpaper \",$1\"", "--", item.filePath];
             applyImage.running = true;
         }
     }
@@ -300,11 +304,11 @@ Item {
                             Image {
                                 anchors.fill: parent
 
-                                source: model.thumbReady ? model.cachePath : ""
+                                source: model.thumbReady ? model.thumbPath : ""
 
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
-                                cache: false
+                                cache: true
                                 smooth: true
                                 sourceSize: Qt.size(root.cardW * 2, root.cardH * 2)
 
