@@ -14,7 +14,7 @@ PanelWindow {
 
     property bool expanded: false
     property string page: "clock"   // "clock" | "player" | "stats" | "wifi" | "bluetooth" | "emojis"
-    property var pages: ["clock", "player", "stats", "emojis"]
+    property var pages: ["clock", "player", "stats"]
 
     readonly property int topMargin: 10
     readonly property int swipeThreshold: 40
@@ -164,6 +164,9 @@ PanelWindow {
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "nowoward-capdynamic"
+    WlrLayershell.keyboardFocus: (root.expanded && (root.page === "emojis" || root.page === "logout"))
+        ? WlrKeyboardFocus.Exclusive
+        : WlrKeyboardFocus.None
     exclusiveZone: 0
 
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
@@ -287,6 +290,7 @@ PanelWindow {
         interval: 1500
         repeat: false
         onTriggered: {
+            if (root.page === "emojis") return;
             if (!gestureArea.containsMouse && !edgeTrigger.containsMouse) {
                 root.hoverRevealed = false;
                 root.setExpanded(false);
@@ -321,6 +325,7 @@ PanelWindow {
         interval: root.idleTimeoutMs
         repeat: false
         onTriggered: {
+            if (root.page === "emojis") return;
             if (root.expanded && !root.peeking && !root.peekingNotif && !root.peekingVolume) {
                 root.hoverRevealed = false;
                 root.setExpanded(false);
@@ -621,6 +626,9 @@ PanelWindow {
                 opacity: root.page === "emojis" ? 1 : 0
                 scale: root.page === "emojis" ? 1 : 0.95
                 visible: opacity > 0.01
+
+                onEmojiPicked: root.setExpanded(false)
+                onUserActivity: root.notifyActivity()
 
                 Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
                 Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }

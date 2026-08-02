@@ -30,8 +30,14 @@ Item {
         return v && v.toLocalFile ? v.toLocalFile() : String(v);
     }
 
-    function toggle() { shown = !shown; if (shown) rescan(); }
-    function show() { shown = true; rescan(); }
+    function toggle() {
+        shown = !shown;
+        if (wallpapers.count === 0) rescan();
+    }
+    function show() {
+        shown = true;
+        if (wallpapers.count === 0) rescan();
+    }
     function hide() { shown = false; }
 
     ListModel { id: wallpapers }
@@ -58,14 +64,16 @@ Item {
                 .sort((a, b) => a.localeCompare(b))
                 .map(p => {
                     const ext = p.substring(p.lastIndexOf(".") + 1);
+                    const fname = p.substring(p.lastIndexOf("/") + 1);
                     const isVid = root.videoExts.indexOf(ext) >= 0;
+                    const cpath = root.cacheDir + "/" + fname + ".jpg";
                     return {
                         filePath: p,
-                        fileName: p.substring(p.lastIndexOf("/") + 1),
+                        fileName: fname,
                         isVideo: isVid,
-                        cachePath: root.cacheDir + "/" + Qt.md5(p) + ".jpg",
-                        thumbPath: isVid ? (root.cacheDir + "/" + Qt.md5(p) + ".jpg") : ("file://" + p),
-                        thumbReady: !isVid
+                        cachePath: cpath,
+                        thumbPath: "file://" + cpath,
+                        thumbReady: true
                     };
                 });
 
@@ -75,15 +83,21 @@ Item {
 
             if (wallpapers.count > 0) {
                 carousel.currentIndex = 0;
-                for (let i = 0; i < wallpapers.count; i++) {
-                    if (wallpapers.get(i).isVideo)
-                        ensureThumbnail(i);
-                }
             }
+
+            bgThumbGen.running = false;
+            bgThumbGen.running = true;
         }
     }
 
-    // ── Thumbnail generation ──────────────────────────────────────────────
+    // ── Parallel Thumbnail Generation Engine ──────────────────────────────
+    property string genScript: (Quickshell.env("HOME") || "/home/capture") + "/Downloads/nowoward-capdynamic/scripts/gen_thumbs.sh"
+
+    Process {
+        id: bgThumbGen
+        command: [root.genScript, root.wallpaperDir, root.cacheDir]
+    }
+
     Process {
         id: mkdirCache
         command: ["mkdir", "-p", root.cacheDir]
@@ -91,8 +105,7 @@ Item {
 
     Component.onCompleted: {
         mkdirCache.running = true;
-        if (root.shown)
-            root.rescan();
+        root.rescan();
     }
 
     property var thumbQueue: []
@@ -306,9 +319,16 @@ Item {
                             color: "#0a0a0a"
 
                             Image {
+                                id: imgCard
                                 anchors.fill: parent
 
-                                source: model.thumbReady ? model.thumbPath : ""
+                                source: model.thumbPath
+
+                                onStatusChanged: {
+                                    if (status === Image.Error && source !== ("file://" + model.filePath)) {
+                                        source = "file://" + model.filePath;
+                                    }
+                                }
 
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true

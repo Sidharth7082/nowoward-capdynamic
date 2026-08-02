@@ -8,6 +8,9 @@ Item {
 
     anchors.fill: parent
 
+    signal emojiPicked()
+    signal userActivity()
+
     property string currentCategory: "Smileys & Emotion"
     property string searchText: ""
 
@@ -24,16 +27,25 @@ Item {
         "Flags": "🚩"
     })
 
+    onVisibleChanged: {
+        if (visible)
+            searchInput.forceActiveFocus();
+    }
+
+    Component.onCompleted: {
+        searchInput.forceActiveFocus();
+    }
+
     property var filteredEmojis: {
         const dummy = EmojiService.count;
         const query = root.searchText.trim().toLowerCase();
         if (query.length > 0) {
-            return EmojiService.allEmojis.filter(e => e.name && e.name.toLowerCase().includes(query)).slice(0, 120);
+            return EmojiService.allEmojis.filter(e => e && e.emoji && e.name && e.name.toLowerCase().includes(query)).slice(0, 300);
         }
         if (root.currentCategory === "Recent") {
             return EmojiService.recentEmojis;
         }
-        return EmojiService.allEmojis.filter(e => e.category === root.currentCategory || (e.category && e.category.indexOf(root.currentCategory) >= 0)).slice(0, 150);
+        return EmojiService.allEmojis.filter(e => e && e.emoji && (e.category === root.currentCategory || (e.category && e.category.indexOf(root.currentCategory) >= 0))).slice(0, 600);
     }
 
     Column {
@@ -71,7 +83,12 @@ Item {
                     color: Theme.text
                     font.pixelSize: 13
                     clip: true
-                    onTextChanged: root.searchText = text
+                    onTextChanged: {
+                        root.searchText = text;
+                        root.userActivity();
+                    }
+
+                    Keys.onEscapePressed: root.emojiPicked()
 
                     Text {
                         text: "Search 1800+ emojis..."
@@ -146,6 +163,7 @@ Item {
                     onClicked: {
                         root.currentCategory = modelData;
                         searchInput.text = "";
+                        root.userActivity();
                     }
                 }
             }
@@ -195,6 +213,7 @@ Item {
                         hoverEnabled: true
                         onClicked: {
                             EmojiService.copyEmoji(modelData.emoji, modelData.name);
+                            root.emojiPicked();
                         }
                     }
                 }
