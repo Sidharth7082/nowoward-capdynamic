@@ -176,7 +176,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: root.expanded
         ? ((root.page === "emojis" || root.page === "workspace") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
-    exclusiveZone: 0
+    exclusiveZone: (root.expanded && root.page === "workspace") ? Math.ceil(capsule.height + root.topMargin + 8) : 0
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
 
     mask: Region {
