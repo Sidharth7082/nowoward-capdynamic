@@ -177,7 +177,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: root.expanded
         ? ((root.page === "emojis" || root.page === "workspace") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
-    exclusiveZone: root.expanded ? Math.ceil(capsule.height + root.topMargin + 8) : 0
+    exclusiveZone: (root.expanded && root.page === "workspace") ? Math.ceil(capsule.height + root.topMargin + 8) : 0
 
     Keys.onPressed: function(event) {
         if (event.key === Qt.Key_Escape) {
