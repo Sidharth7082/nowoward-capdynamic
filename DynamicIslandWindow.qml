@@ -80,7 +80,15 @@ PanelWindow {
             idleTimer.stop();
     }
 
-    onExpandedChanged: syncIdleTimer()
+    onExpandedChanged: {
+        syncIdleTimer();
+        if (expanded && page === "workspace")
+            workspacePage.forceFocus();
+    }
+    onPageChanged: {
+        if (expanded && page === "workspace")
+            workspacePage.forceFocus();
+    }
     onPeekingChanged: syncIdleTimer()
 
     function setExpanded(val) {
@@ -321,87 +329,104 @@ PanelWindow {
     Shortcut {
         sequences: ["Esc", "Escape"]
         enabled: root.expanded
+        context: Qt.ApplicationShortcut
         onActivated: root.setExpanded(false)
     }
 
     Shortcut {
         sequence: "Right"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.moveSelection(1)
     }
     Shortcut {
         sequence: "Left"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.moveSelection(-1)
     }
     Shortcut {
         sequence: "Down"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.moveSelection(5)
     }
     Shortcut {
         sequence: "Up"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.moveSelection(-5)
     }
     Shortcut {
         sequence: "Return"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.confirmSelection()
     }
     Shortcut {
         sequence: "Space"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.confirmSelection()
     }
     Shortcut {
         sequence: "1"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(0)
     }
     Shortcut {
         sequence: "2"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(1)
     }
     Shortcut {
         sequence: "3"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(2)
     }
     Shortcut {
         sequence: "4"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(3)
     }
     Shortcut {
         sequence: "5"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(4)
     }
     Shortcut {
         sequence: "6"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(5)
     }
     Shortcut {
         sequence: "7"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(6)
     }
     Shortcut {
         sequence: "8"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(7)
     }
     Shortcut {
         sequence: "9"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(8)
     }
     Shortcut {
         sequence: "0"
         enabled: root.expanded && root.page === "workspace"
+        context: Qt.ApplicationShortcut
         onActivated: workspacePage.selectIndex(9)
     }
 

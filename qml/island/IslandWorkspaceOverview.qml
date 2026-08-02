@@ -3,7 +3,7 @@ import Quickshell
 import "../workspace"
 import "../services"
 
-Item {
+FocusScope {
     id: root
     anchors.fill: parent
     focus: true
@@ -12,6 +12,10 @@ Item {
     signal userActivity()
 
     property var screen: null
+
+    function forceFocus() {
+        overviewLayer.forceActiveFocus();
+    }
 
     function moveSelection(delta) {
         overviewLayer.moveSelection(delta);
