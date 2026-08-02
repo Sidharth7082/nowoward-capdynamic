@@ -49,9 +49,10 @@ if hl.plugin and hl.plugin.myglass then
         blur_strength = 0.04,
     })
 
-    -- Enable liquid glass on Dynamic Island & Wallpaper Picker
+    -- Enable liquid glass on Dynamic Island, Wallpaper Picker & WLogout
     hg.layer("nowoward-capdynamic", { preset = "clear" })
     hg.layer("nowoward-capdynamic-wallpaperpicker", { preset = "clear" })
+    hg.layer("nowoward-capdynamic-wlogout", { preset = "clear" })
 end
 ```
 
@@ -64,7 +65,7 @@ plugin:myglass {
 
     layers {
         enabled = 1
-        namespaces = nowoward-capdynamic, nowoward-capdynamic-wallpaperpicker
+        namespaces = nowoward-capdynamic, nowoward-capdynamic-wallpaperpicker, nowoward-capdynamic-wlogout
         preset = clear
     }
 }
@@ -74,6 +75,22 @@ plugin:myglass {
 ```bash
 hyprctl reload
 ```
+
+---
+
+### ❌ How to Turn OFF MyGlass Mode
+
+To turn OFF liquid glass mode and revert back to solid translucent dark capsules:
+
+* **Method 1: Terminal Command**
+  ```bash
+  hyprpm disable myglass && hyprctl reload
+  ```
+
+* **Method 2: Hyprland Config**
+  - In Lua (`~/.config/hypr/module/myglass.lua`): set `enabled = false` in `hg.config({ enabled = false })`.
+  - In `hyprland.conf`: set `enabled = 0` under `layers`.
+  - Run `hyprctl reload` to apply.
 
 ---
 
