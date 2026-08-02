@@ -8,3 +8,5 @@ singleton NetworkService 1.0 NetworkService.qml
 singleton BluetoothService 1.0 BluetoothService.qml
 singleton UsbService 1.0 UsbService.qml
 singleton EmojiService 1.0 EmojiService.qml
+singleton WorkspaceService 1.0 WorkspaceService.qml
+singleton UserConfig 1.0 UserConfig.qml

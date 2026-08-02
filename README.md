@@ -131,9 +131,9 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | :---: | :---: |
 | ![Collapsed Pill](assets/default_island/collapsed_pill.png) | ![Emoji Picker Default Mode](assets/default_island/emoji.png) |
 
-| 🚪 Top WLogout Overlay | |
+| 🖥️ 2x5 Workspace Overview (Default Mode) | 🚪 Top WLogout Overlay |
 | :---: | :---: |
-| ![WLogout Panel Default Mode](assets/default_island/wlogout.png) | |
+| ![Workspace Overview Default Mode](assets/default_island/workspace.png) | ![WLogout Panel Default Mode](assets/default_island/wlogout.png) |
 
 ---
 
@@ -151,9 +151,9 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | :---: | :---: |
 | ![Collapsed Pill](assets/myglass_on_island/collapsed_pill.png) | ![Emoji Picker MyGlass Mode](assets/myglass_on_island/emoji.png) |
 
-| 🚪 Top WLogout Overlay | |
+| 🖥️ 2x5 Workspace Overview (MyGlass Mode) | 🚪 Top WLogout Overlay |
 | :---: | :---: |
-| ![WLogout Panel MyGlass Mode](assets/myglass_on_island/wlogout.png) | |
+| ![Workspace Overview MyGlass Mode](assets/myglass_on_island/workspace.png) | ![WLogout Panel MyGlass Mode](assets/myglass_on_island/wlogout.png) |
 
 </div>
 
@@ -173,6 +173,7 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | **🔊 Transient Volume Overlay** | Displays a sleek audio level indicator pill whenever hardware volume keys are pressed. |
 | **🎯 Top-Edge Sensor** | Remains 100% hidden offscreen until pointer touches top monitor edge. |
 | **🙈 Window Auto-Hide** | Hides automatically when active workspace windows are present to keep titlebars and browser tabs clear. |
+| **🖼️ 2x5 Workspace Overview Grid** | Wide in-island 2x5 grid showing Workspaces 1–10 with wallpaper backgrounds, active workspace blue outline, mini app tiles, number key jumps, and `SUPER + TAB` shortcut. |
 | **🎨 Apple-Style Emoji Picker** | Built-in 1800+ Unicode 16.0 emoji grid with category tabs, live search input, recent list, and 1-click `wl-copy` clipboard integration (`SUPER + SHIFT + E`). |
 | **🖼️ Cover-Flow Wallpaper Browser** | Smooth PathView wallpaper carousel with `ffmpeg` thumbnail caching and `awww` / `mpvpaper` backends. |
 

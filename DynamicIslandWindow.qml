@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import "qml/island"
 import "qml/services"
 import "qml/theme"
+import "qml/workspace"
 
 // A Dynamic-Island-style widget: a small pill in the top center of
 // the screen showing clock/notifications/volume. Tap expands it; once expanded,
@@ -32,6 +33,7 @@ PanelWindow {
         && !root.peeking
         && !root.peekingNotif
         && !root.peekingVolume
+        && !root.peekingWorkspace
         && !root.hoverRevealed
 
     visible: !hideForFullscreen && !suppressPeek
@@ -105,6 +107,7 @@ PanelWindow {
     function showBluetooth() { setExpanded(true); page = "bluetooth"; notifyActivity(); }
     function showLogout() { setExpanded(true); page = "logout"; notifyActivity(); }
     function showEmojis() { setExpanded(true); page = "emojis"; notifyActivity(); }
+    function showWorkspace() { setExpanded(true); page = "workspace"; notifyActivity(); }
 
     function nextPage() {
         const idx = pages.indexOf(root.page);
@@ -130,15 +133,17 @@ PanelWindow {
                     ? Theme.playerWidth
                     : (root.page === "stats"
                         ? Theme.statsWidth
-                        : (root.page === "emojis"
-                            ? 480
-                            : (root.page === "notifs"
-                                ? 360
-                                : (root.page === "wifi"
-                                    ? Theme.wifiWidth
-                                    : (root.page === "bluetooth"
-                                        ? Theme.btWidth
-                                        : (root.page === "logout" ? Theme.logoutWidth : Theme.clockWidth)))))))))
+                        : (root.page === "workspace"
+                            ? 1060
+                            : (root.page === "emojis"
+                                ? 480
+                                : (root.page === "notifs"
+                                    ? 360
+                                    : (root.page === "wifi"
+                                        ? Theme.wifiWidth
+                                        : (root.page === "bluetooth"
+                                            ? Theme.btWidth
+                                            : (root.page === "logout" ? Theme.logoutWidth : Theme.clockWidth))))))))))
 
     readonly property int targetHeight: peekingNotif
         ? (root.notifExpanded ? 90 : Theme.notificationHeight)
@@ -150,25 +155,36 @@ PanelWindow {
                     ? Theme.playerHeight
                     : (root.page === "stats"
                         ? Theme.statsHeight
-                        : (root.page === "emojis"
-                            ? 320
-                            : (root.page === "notifs"
-                                ? 220
-                                : (root.page === "wifi"
-                                    ? Theme.wifiHeight
-                                    : (root.page === "bluetooth"
-                                        ? Theme.btHeight
-                                        : (root.page === "logout" ? Theme.logoutHeight : Theme.clockHeight)))))))))
+                        : (root.page === "workspace"
+                            ? 270
+                            : (root.page === "emojis"
+                                ? 320
+                                : (root.page === "notifs"
+                                    ? 220
+                                    : (root.page === "wifi"
+                                        ? Theme.wifiHeight
+                                        : (root.page === "bluetooth"
+                                            ? Theme.btHeight
+                                            : (root.page === "logout" ? Theme.logoutHeight : Theme.clockHeight))))))))))
 
     color: "transparent"
     anchors { top: true; left: true; right: true }
 
+    focusable: root.expanded
+    focus: root.expanded
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "nowoward-capdynamic"
     WlrLayershell.keyboardFocus: root.expanded
-        ? (root.page === "emojis" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
+        ? ((root.page === "emojis" || root.page === "workspace") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
-    exclusiveZone: 0
+    exclusiveZone: root.expanded ? Math.ceil(capsule.height + root.topMargin + 8) : 0
+
+    Keys.onPressed: function(event) {
+        if (event.key === Qt.Key_Escape) {
+            root.setExpanded(false);
+            event.accepted = true;
+        }
+    }
 
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
 
@@ -223,10 +239,32 @@ PanelWindow {
     // Auto-peek for Volume
     property bool peekingVolume: false
     property bool peekingWorkspace: false
+    property string workspaceSlideDirection: "none"
+    property int _lastWsId: 1
+
+    CompositorWorkspaceTracker {
+        id: workspaceTracker
+        hyprMonitor: root.hyprMonitor
+        hyprMonitorName: root.hyprMonitor ? root.hyprMonitor.name : ""
+        monitorFocused: root.hyprMonitor ? root.hyprMonitor.focused : true
+
+        onWorkspaceActivated: function(workspaceId, side) {
+            if (!root.expanded && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
+                root.workspaceSlideDirection = side || "none";
+                root.peekingWorkspace = true;
+                wsTimer.restart();
+            }
+        }
+    }
 
     Connections {
         target: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace : null
         function onIdChanged() {
+            const currentId = hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.id : 1;
+            if (currentId !== root._lastWsId) {
+                root.workspaceSlideDirection = currentId > root._lastWsId ? "right" : (currentId < root._lastWsId ? "left" : "none");
+                root._lastWsId = currentId;
+            }
             if (!root.expanded && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peekingWorkspace = true;
                 wsTimer.restart();
@@ -237,7 +275,10 @@ PanelWindow {
     Timer {
         id: wsTimer
         interval: 1500
-        onTriggered: root.peekingWorkspace = false
+        onTriggered: {
+            root.peekingWorkspace = false;
+            root.workspaceSlideDirection = "none";
+        }
     }
 
     Connections {
@@ -287,9 +328,90 @@ PanelWindow {
     }
 
     Shortcut {
-        sequence: "Escape"
+        sequences: ["Esc", "Escape"]
         enabled: root.expanded
         onActivated: root.setExpanded(false)
+    }
+
+    Shortcut {
+        sequence: "Right"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.moveSelection(1)
+    }
+    Shortcut {
+        sequence: "Left"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.moveSelection(-1)
+    }
+    Shortcut {
+        sequence: "Down"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.moveSelection(5)
+    }
+    Shortcut {
+        sequence: "Up"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.moveSelection(-5)
+    }
+    Shortcut {
+        sequence: "Return"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.confirmSelection()
+    }
+    Shortcut {
+        sequence: "Space"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.confirmSelection()
+    }
+    Shortcut {
+        sequence: "1"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(0)
+    }
+    Shortcut {
+        sequence: "2"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(1)
+    }
+    Shortcut {
+        sequence: "3"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(2)
+    }
+    Shortcut {
+        sequence: "4"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(3)
+    }
+    Shortcut {
+        sequence: "5"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(4)
+    }
+    Shortcut {
+        sequence: "6"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(5)
+    }
+    Shortcut {
+        sequence: "7"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(6)
+    }
+    Shortcut {
+        sequence: "8"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(7)
+    }
+    Shortcut {
+        sequence: "9"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(8)
+    }
+    Shortcut {
+        sequence: "0"
+        enabled: root.expanded && root.page === "workspace"
+        onActivated: workspacePage.selectIndex(9)
     }
 
     Timer {
@@ -297,7 +419,7 @@ PanelWindow {
         interval: 1500
         repeat: false
         onTriggered: {
-            if (!gestureArea.containsMouse && !edgeTrigger.containsMouse) {
+            if (!capsuleHoverHandler.hovered && !gestureArea.containsMouse && !edgeTrigger.containsMouse) {
                 root.hoverRevealed = false;
                 root.setExpanded(false);
             }
@@ -331,6 +453,10 @@ PanelWindow {
         interval: root.idleTimeoutMs
         repeat: false
         onTriggered: {
+            if (capsuleHoverHandler.hovered) {
+                idleTimer.restart();
+                return;
+            }
             if (root.expanded && !root.peeking && !root.peekingNotif && !root.peekingVolume) {
                 root.hoverRevealed = false;
                 root.setExpanded(false);
@@ -353,6 +479,19 @@ PanelWindow {
         clip: true
         scale: gestureArea.containsPress ? 0.975 : (gestureArea.containsMouse ? 1.012 : 1.0)
         transformOrigin: Item.Center
+
+        HoverHandler {
+            id: capsuleHoverHandler
+            target: capsule
+            onHoveredChanged: {
+                if (hovered) {
+                    leaveTimer.stop();
+                    root.notifyActivity();
+                } else if (root.expanded) {
+                    leaveTimer.restart();
+                }
+            }
+        }
 
         Behavior on color {
             ColorAnimation { duration: 200 }
@@ -416,6 +555,10 @@ PanelWindow {
                     root.peekingVolume = false;
                     volTimer.stop();
                 }
+                if (root.peekingWorkspace) {
+                    root.peekingWorkspace = false;
+                    wsTimer.stop();
+                }
                 if (root.expanded)
                     root.notifyActivity();
             }
@@ -458,7 +601,7 @@ PanelWindow {
         // Collapsed content
         Text {
             anchors.centerIn: parent
-            opacity: (!root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
+            opacity: (!root.expanded && !root.peekingNotif && !root.peekingVolume && !root.peekingWorkspace) ? 1 : 0
             visible: opacity > 0.01
             text: clock.timeText
             color: Theme.text
@@ -483,6 +626,7 @@ PanelWindow {
             anchors.fill: parent
             workspaceId: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.id : 1
             workspaceName: hyprMonitor && hyprMonitor.activeWorkspace ? hyprMonitor.activeWorkspace.name : "1"
+            slideDirection: root.workspaceSlideDirection
             opacity: (root.peekingWorkspace && !root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
             visible: opacity > 0.01
 
@@ -633,6 +777,22 @@ PanelWindow {
                 visible: opacity > 0.01
 
                 onEmojiPicked: root.setExpanded(false)
+                onUserActivity: root.notifyActivity()
+
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+            }
+
+            // Page 10: Workspace Overview Page
+            IslandWorkspaceOverview {
+                id: workspacePage
+                anchors.fill: parent
+                screen: root.screen
+                opacity: root.page === "workspace" ? 1 : 0
+                scale: root.page === "workspace" ? 1 : 0.95
+                visible: opacity > 0.01
+
+                onWorkspaceSelected: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
                 Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }

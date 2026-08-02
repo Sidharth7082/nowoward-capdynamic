@@ -92,6 +92,10 @@ Scope {
         function emojis() {
             shellRoot.forFocusedWindow((window) => window.showEmojis());
         }
+
+        function workspace() {
+            shellRoot.forFocusedWindow((window) => window.showWorkspace());
+        }
     }
 
     // quickshell ipc call picker toggle / show / hide
