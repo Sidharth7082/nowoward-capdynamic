@@ -331,6 +331,7 @@ PanelWindow {
         opacity: root.shouldHidePill ? 0 : 1
         width: root.targetWidth
         height: root.targetHeight
+        radius: (root.expanded || root.peekingNotif) ? 26 : height / 2
         color: Theme.isMyGlass ? "#1a121216" : "#f20d1117"
         border.color: Theme.isMyGlass ? "#33ffffff" : "#50ffffff"
         border.width: 1
