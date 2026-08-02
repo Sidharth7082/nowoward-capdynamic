@@ -92,6 +92,7 @@ PanelWindow {
         } else {
             leaveTimer.stop();
             idleTimer.stop();
+            page = "clock";
         }
     }
 
