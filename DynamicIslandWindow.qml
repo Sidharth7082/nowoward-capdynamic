@@ -171,21 +171,12 @@ PanelWindow {
     anchors { top: true; left: true; right: true }
 
     focusable: root.expanded
-    focus: root.expanded
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "nowoward-capdynamic"
     WlrLayershell.keyboardFocus: root.expanded
         ? ((root.page === "emojis" || root.page === "workspace") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
     exclusiveZone: 0
-
-    Keys.onPressed: function(event) {
-        if (event.key === Qt.Key_Escape) {
-            root.setExpanded(false);
-            event.accepted = true;
-        }
-    }
-
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
 
     mask: Region {

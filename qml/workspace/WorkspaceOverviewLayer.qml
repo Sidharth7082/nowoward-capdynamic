@@ -89,17 +89,6 @@ Item {
     focus: true
     property int keyboardSelectedIndex: Math.max(0, Math.min(workspacesShown - 1, effectiveActiveWorkspaceId - 1))
 
-    onShowConditionChanged: {
-        if (showCondition) {
-            keyboardSelectedIndex = Math.max(0, Math.min(workspacesShown - 1, effectiveActiveWorkspaceId - 1));
-            forceActiveFocus();
-        }
-    }
-
-    Component.onCompleted: {
-        forceActiveFocus();
-    }
-
     function selectCurrentKeyboardWorkspace() {
         const ws = keyboardSelectedIndex + 1;
         hyprDispatch.focusWorkspace(ws);
@@ -377,6 +366,8 @@ Item {
 
     onShowConditionChanged: {
         if (showCondition) {
+            keyboardSelectedIndex = Math.max(0, Math.min(workspacesShown - 1, effectiveActiveWorkspaceId - 1));
+            forceActiveFocus();
             if (hyprlandData) hyprlandData.updateAll();
             scheduleRefresh();
         } else {
@@ -385,7 +376,10 @@ Item {
     }
     onWorkspaceGroupChanged: scheduleRefresh()
     onToplevelValuesChanged: scheduleRefresh()
-    Component.onCompleted: scheduleRefresh()
+    Component.onCompleted: {
+        forceActiveFocus();
+        scheduleRefresh();
+    }
 
     Timer { id: refreshTimer; interval: 80; repeat: false; onTriggered: root.refreshToplevels() }
     Timer {
