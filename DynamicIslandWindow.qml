@@ -595,6 +595,7 @@ PanelWindow {
                 opacity: root.page === "logout" ? 1 : 0
                 scale: root.page === "logout" ? 1 : 0.95
                 visible: opacity > 0.01
+                focus: root.page === "logout"
 
                 onActionTriggered: root.setExpanded(false)
 

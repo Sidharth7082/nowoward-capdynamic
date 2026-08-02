@@ -52,11 +52,22 @@ Item {
             Behavior on opacity { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
 
             IslandLogoutLayer {
+                id: logoutLayer
                 anchors.centerIn: parent
                 width: Theme.logoutWidth
                 height: Theme.logoutHeight
+                focus: root.shown
 
                 onActionTriggered: root.hide()
+            }
+
+            Connections {
+                target: root
+                function onShownChanged() {
+                    if (root.shown) {
+                        logoutLayer.forceActiveFocus();
+                    }
+                }
             }
         }
     }
