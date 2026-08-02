@@ -137,7 +137,10 @@ Item {
     Keys.onEscapePressed: closeRequested()
 
     Keys.onPressed: function(event) {
-        if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
+        if (event.key === Qt.Key_Escape) {
+            closeRequested();
+            event.accepted = true;
+        } else if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
             const num = event.key - Qt.Key_1;
             keyboardSelectedIndex = num;
             selectCurrentKeyboardWorkspace();
