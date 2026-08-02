@@ -107,6 +107,15 @@ Scope {
         function hide() { wlogoutPanel.hide(); }
     }
 
+    // quickshell ipc call theme glassMode / defaultMode / toggle
+    IpcHandler {
+        target: "theme"
+
+        function glassMode() { Theme.isMyGlass = true; }
+        function defaultMode() { Theme.isMyGlass = false; }
+        function toggle() { Theme.isMyGlass = !Theme.isMyGlass; }
+    }
+
     WLogoutPanel {
         id: wlogoutPanel
     }

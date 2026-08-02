@@ -2,8 +2,10 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    property color bg: Colors.background
-    property color border: Colors.border
+    property bool isMyGlass: true
+
+    property color bg: isMyGlass ? "#1a121216" : "#f20d1117"
+    property color border: isMyGlass ? "#33ffffff" : "#40ffffff"
     property color text: Colors.textPrimary
     property color subtext: Colors.textSecondary
     property color muted: Colors.textMuted
