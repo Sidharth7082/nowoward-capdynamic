@@ -286,12 +286,17 @@ PanelWindow {
         }
     }
 
+    Shortcut {
+        sequence: "Escape"
+        enabled: root.expanded
+        onActivated: root.setExpanded(false)
+    }
+
     Timer {
         id: leaveTimer
         interval: 1500
         repeat: false
         onTriggered: {
-            if (root.page === "emojis") return;
             if (!gestureArea.containsMouse && !edgeTrigger.containsMouse) {
                 root.hoverRevealed = false;
                 root.setExpanded(false);
@@ -326,7 +331,6 @@ PanelWindow {
         interval: root.idleTimeoutMs
         repeat: false
         onTriggered: {
-            if (root.page === "emojis") return;
             if (root.expanded && !root.peeking && !root.peekingNotif && !root.peekingVolume) {
                 root.hoverRevealed = false;
                 root.setExpanded(false);
