@@ -494,7 +494,14 @@ PanelWindow {
         border.width: 1
         clip: true
         scale: gestureArea.containsPress ? 0.975 : (gestureArea.containsMouse ? 1.012 : 1.0)
-        transformOrigin: Item.Center
+        focus: root.expanded
+        Keys.onEscapePressed: root.setExpanded(false)
+        Keys.onPressed: function(event) {
+            if (event.key === Qt.Key_Escape) {
+                root.setExpanded(false);
+                event.accepted = true;
+            }
+        }
 
         HoverHandler {
             id: capsuleHoverHandler
