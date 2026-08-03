@@ -116,6 +116,15 @@ PanelWindow {
     function showLogout() { setExpanded(true); page = "logout"; notifyActivity(); }
     function showEmojis() { setExpanded(true); page = "emojis"; notifyActivity(); }
     function showWorkspace() { setExpanded(true); page = "workspace"; notifyActivity(); }
+    function showCliphist() {
+        setExpanded(true);
+        page = "cliphist";
+        notifyActivity();
+        Qt.callLater(() => {
+            if (cliphistPage && cliphistPage.focusInput)
+                cliphistPage.focusInput();
+        });
+    }
 
     function nextPage() {
         const idx = pages.indexOf(root.page);
@@ -145,13 +154,15 @@ PanelWindow {
                             ? 1060
                             : (root.page === "emojis"
                                 ? 480
-                                : (root.page === "notifs"
-                                    ? 360
-                                    : (root.page === "wifi"
-                                        ? Theme.wifiWidth
-                                        : (root.page === "bluetooth"
-                                            ? Theme.btWidth
-                                            : (root.page === "logout" ? Theme.logoutWidth : Theme.clockWidth))))))))))
+                                : (root.page === "cliphist"
+                                    ? 380
+                                    : (root.page === "notifs"
+                                        ? 360
+                                        : (root.page === "wifi"
+                                            ? Theme.wifiWidth
+                                            : (root.page === "bluetooth"
+                                                ? Theme.btWidth
+                                                : (root.page === "logout" ? Theme.logoutWidth : Theme.clockWidth)))))))))))
 
     readonly property int targetHeight: peekingNotif
         ? (root.notifExpanded ? 90 : Theme.notificationHeight)
@@ -167,13 +178,15 @@ PanelWindow {
                             ? 270
                             : (root.page === "emojis"
                                 ? 320
-                                : (root.page === "notifs"
-                                    ? 220
-                                    : (root.page === "wifi"
-                                        ? Theme.wifiHeight
-                                        : (root.page === "bluetooth"
-                                            ? Theme.btHeight
-                                            : (root.page === "logout" ? Theme.logoutHeight : Theme.clockHeight))))))))))
+                                : (root.page === "cliphist"
+                                    ? 250
+                                    : (root.page === "notifs"
+                                        ? 220
+                                        : (root.page === "wifi"
+                                            ? Theme.wifiHeight
+                                            : (root.page === "bluetooth"
+                                                ? Theme.btHeight
+                                                : (root.page === "logout" ? Theme.logoutHeight : Theme.clockHeight)))))))))))
 
     color: "transparent"
     anchors { top: true; left: true; right: true }
@@ -182,10 +195,16 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "nowoward-capdynamic"
     WlrLayershell.keyboardFocus: root.expanded
-        ? ((root.page === "emojis" || root.page === "workspace") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
+        ? ((root.page === "emojis" || root.page === "workspace" || root.page === "cliphist") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
     exclusiveZone: (root.expanded && root.page === "workspace") ? Math.ceil(capsule.height + root.topMargin + 8) : 0
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
+
+    Shortcut {
+        sequence: "Escape"
+        enabled: root.expanded
+        onActivated: root.setExpanded(false)
+    }
 
     mask: Region {
         x: Math.floor(capsule.x)
@@ -816,6 +835,21 @@ PanelWindow {
                 visible: opacity > 0.01
 
                 onWorkspaceSelected: root.setExpanded(false)
+                onUserActivity: root.notifyActivity()
+
+                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+            }
+
+            // Page 11: Cliphist Clipboard Manager Page
+            IslandCliphist {
+                id: cliphistPage
+                anchors.fill: parent
+                opacity: root.page === "cliphist" ? 1 : 0
+                scale: root.page === "cliphist" ? 1 : 0.95
+                visible: opacity > 0.01
+
+                onCloseRequested: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
                 Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }

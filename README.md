@@ -131,9 +131,13 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | :---: | :---: |
 | ![Collapsed Pill](assets/default_island/collapsed_pill.png) | ![Emoji Picker Default Mode](assets/default_island/emoji.png) |
 
-| 🖥️ 2x5 Workspace Overview (Default Mode) | 🚪 Top WLogout Overlay |
+| 🖥️ 2x5 Workspace Overview (Default Mode) | 📋 Clipboard History (Default Mode) |
 | :---: | :---: |
-| ![Workspace Overview Default Mode](assets/default_island/workspace.png) | ![WLogout Panel Default Mode](assets/default_island/wlogout.png) |
+| ![Workspace Overview Default Mode](assets/default_island/workspace.png) | ![Clipboard History Default Mode](assets/default_island/clipboard.png) |
+
+| 🚪 Top WLogout Overlay | |
+| :---: | :---: |
+| ![WLogout Panel Default Mode](assets/default_island/wlogout.png) | |
 
 ---
 
@@ -151,9 +155,13 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | :---: | :---: |
 | ![Collapsed Pill](assets/myglass_on_island/collapsed_pill.png) | ![Emoji Picker MyGlass Mode](assets/myglass_on_island/emoji.png) |
 
-| 🖥️ 2x5 Workspace Overview (MyGlass Mode) | 🚪 Top WLogout Overlay |
+| 🖥️ 2x5 Workspace Overview (MyGlass Mode) | 📋 Clipboard History (MyGlass Mode) |
 | :---: | :---: |
-| ![Workspace Overview MyGlass Mode](assets/myglass_on_island/workspace.png) | ![WLogout Panel MyGlass Mode](assets/myglass_on_island/wlogout.png) |
+| ![Workspace Overview MyGlass Mode](assets/myglass_on_island/workspace.png) | ![Clipboard History MyGlass Mode](assets/myglass_on_island/clipboard.png) |
+
+| 🚪 Top WLogout Overlay | |
+| :---: | :---: |
+| ![WLogout Panel MyGlass Mode](assets/myglass_on_island/wlogout.png) | |
 
 </div>
 
@@ -166,6 +174,7 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | **🏝️ Dynamic Capsule Morphing** | Smooth Apple-style `OutBack` spring physics that expand, collapse, and scale dynamically on interaction. |
 | **🕒 Minimal Clock & Date** | Compact clock pill that reveals when cursor reaches top edge and expands into date view on click. |
 | **🎵 Live MPRIS Visualizer** | Controls Spotify, Brave, mpv, or any MPRIS player with spinning album art and live animated audio frequency bars. |
+| **📋 Clipboard History Manager** | Integrated cliphist manager with live search, text & image previews, item deletion, keyboard navigation, and 1-click `wl-copy` restoration. |
 | **⚙️ Control Center Card** | Interactive Brightness & Volume sliders, real-time CPU %, RAM %, and Battery % badges with animated fill bars. |
 | **📶 Wi-Fi Sub-Page** | Left-click toggle, right-click opens dedicated in-island network scanner page with live SSIDs and signal strength. |
 | **🔵 Bluetooth Sub-Page** | Left-click toggle, right-click opens dedicated in-island device scanner page with auto-start daemon prompt. |
@@ -186,6 +195,8 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 | **Core** | `hyprland` | `sudo pacman -S hyprland` | Wayland Compositor |
 | **Core** | `quickshell` | `quickshell` (PATH) | QML Desktop Shell Framework |
 | **Core** | `ffmpeg` | `sudo pacman -S ffmpeg` | Wallpaper Thumbnail Generation |
+| **Clipboard** | `cliphist` | `sudo pacman -S cliphist` | Wayland Clipboard History Daemon |
+| **Clipboard** | `wl-clipboard` | `sudo pacman -S wl-clipboard` | Wayland Clipboard Utilities (`wl-copy`) |
 | **Wallpaper** | `awww` | `yay -S awww` | Static Wallpaper Backend |
 | **Wallpaper** | `mpvpaper` | `yay -S mpvpaper` (Optional) | Video Wallpaper Backend |
 | **Control** | `brightnessctl` | `sudo pacman -S brightnessctl` | Display Brightness Slider Control |
@@ -207,6 +218,8 @@ Control the Dynamic Island or Wallpaper Picker from terminal scripts, waybar but
 | **Show Music Player Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island player` |
 | **Show Control Center Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island stats` |
 | **Show Notification History** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs` |
+| **Show Clipboard History** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island cliphist` |
+| **Toggle Clipboard Overlay** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call cliphist toggle` |
 | **Show Wi-Fi Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island wifi` |
 | **Show Bluetooth Detail Page** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island bluetooth` |
 | **Show Logout Menu (Island)** | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island logout` |
@@ -229,6 +242,7 @@ end)
 
 -- keybind.lua
 hl.bind("SUPER + I", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle"))
+hl.bind("SUPER + V", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call cliphist toggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs"))
 hl.bind("SUPER + L", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
@@ -243,6 +257,7 @@ exec-once = quickshell -p ~/.config/quickshell/nowoward-capdynamic
 
 # Keybindings
 bind = SUPER, I, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle
+bind = SUPER, V, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call cliphist toggle
 bind = SUPER, N, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island notifs
 bind = SUPER, L, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle
 bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
@@ -255,7 +270,7 @@ bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
 
 ```
 nowoward-capdynamic/
-├── shell.qml                              # Main entrypoint & IPC handlers ("island", "picker", "wlogout")
+├── shell.qml                              # Main entrypoint & IPC handlers ("island", "picker", "wlogout", "cliphist")
 ├── DynamicIslandWindow.qml                # Capsule geometry, animations, mask, spring physics
 ├── wlogout/                               # Custom wlogout theme & configuration
 │   ├── layout                             # wlogout button actions & keybindings
@@ -263,6 +278,8 @@ nowoward-capdynamic/
 │   ├── launch.sh                          # Direct launch script for GTK wlogout
 │   ├── install.sh                         # Install theme to ~/.config/wlogout
 │   └── icons/                             # SVG action icons (lock, suspend, logout, reboot, shutdown)
+├── scripts/
+│   └── cliphist-img.sh                    # Helper script for cliphist image decoding & MIME type handling
 ├── qml/
 │   ├── theme/
 │   │   ├── Colors.qml                     # Translucent glass color tokens
@@ -276,6 +293,8 @@ nowoward-capdynamic/
 │   │   ├── BrightnessService.qml          # brightnessctl display control
 │   │   ├── NetworkService.qml             # NetworkManager Wi-Fi scanner
 │   │   └── BluetoothService.qml           # BlueZ Bluetooth scanner
+│   ├── cliphist/
+│   │   └── CliphistPanel.qml              # Standalone Clipboard History manager UI
 │   ├── island/
 │   │   ├── IslandClock.qml                # Clock & date formatter
 │   │   ├── IslandMprisController.qml      # MPRIS player transport
@@ -286,14 +305,15 @@ nowoward-capdynamic/
 │   │   ├── IslandBluetoothLayer.qml       # Dedicated Bluetooth sub-page UI
 │   │   ├── IslandNotificationLayer.qml    # Notification toast UI
 │   │   ├── IslandVolumeLayer.qml          # Volume overlay UI
-│   │   └── IslandLogoutLayer.qml          # Dynamic Island Logout sub-page UI
+│   │   ├── IslandLogoutLayer.qml          # Dynamic Island Logout sub-page UI
+│   │   └── IslandCliphist.qml             # Clipboard History sub-page UI (v1.4)
 │   ├── wlogout/
 │   │   └── WLogoutPanel.qml               # Standalone top-capsule Logout overlay window
 │   └── wallpaperpicker/
 │       └── WallpaperPickerPanel.qml       # Cover-flow wallpaper browser
 └── assets/
-    ├── default_island/                    # Default mode screenshot assets
-    └── myglass_on_island/                 # MyGlass mode screenshot assets
+    ├── default_island/                    # Default mode screenshot assets (includes clipboard.png)
+    └── myglass_on_island/                 # MyGlass mode screenshot assets (includes clipboard.png)
 ```
 
 ---
@@ -303,3 +323,4 @@ nowoward-capdynamic/
 - Created & Maintained by **[Sidharth7082](https://github.com/Sidharth7082)** (Capture)
 - Built with **[Quickshell](https://quickshell.org)** for **[Hyprland](https://hyprland.org)**
 - Open Source under the **MIT License**
+

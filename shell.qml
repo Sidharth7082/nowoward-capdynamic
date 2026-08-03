@@ -96,6 +96,10 @@ Scope {
         function workspace() {
             shellRoot.forFocusedWindow((window) => window.showWorkspace());
         }
+
+        function cliphist() {
+            shellRoot.forFocusedWindow((window) => window.showCliphist());
+        }
     }
 
     // quickshell ipc call picker toggle / show / hide
@@ -127,6 +131,15 @@ Scope {
 
     WLogoutPanel {
         id: wlogoutPanel
+    }
+
+    // quickshell ipc call cliphist toggle / show / hide
+    IpcHandler {
+        target: "cliphist"
+
+        function toggle() { shellRoot.forFocusedWindow((w) => { if (w.expanded && w.page === "cliphist") w.setExpanded(false); else w.showCliphist(); }); }
+        function show() { shellRoot.forFocusedWindow((w) => w.showCliphist()); }
+        function hide() { shellRoot.forEachWindow((w) => w.setExpanded(false)); }
     }
 
     WallpaperPickerPanel {
