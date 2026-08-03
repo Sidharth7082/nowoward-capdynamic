@@ -91,7 +91,7 @@ Item {
     }
 
     // ── Parallel Thumbnail Generation Engine ──────────────────────────────
-    property string genScript: Qt.resolvedUrl("../../scripts/gen_thumbs.sh").replace("file://", "")
+    property string genScript: String(Qt.resolvedUrl("../../scripts/gen_thumbs.sh")).replace("file://", "")
 
     Process {
         id: bgThumbGen
