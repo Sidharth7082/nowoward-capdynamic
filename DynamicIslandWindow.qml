@@ -204,7 +204,11 @@ PanelWindow {
     WlrLayershell.keyboardFocus: root.expanded
         ? ((root.page === "emojis" || root.page === "workspace" || root.page === "cliphist") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand)
         : WlrKeyboardFocus.None
-    exclusiveZone: (root.expanded && root.page === "workspace") ? Math.ceil(capsule.height + root.topMargin + 8) : 0
+    // Overlay-style: the island floats over content and never reserves an
+    // exclusive zone, so opening the workspace overview doesn't shove every
+    // window down 280px (and back up on close) — that reflow looked like the
+    // island 'overlaying' windows and caused visible lag.
+    exclusiveZone: 0
     implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
 
     Shortcut {
@@ -285,7 +289,7 @@ PanelWindow {
         monitorFocused: root.hyprMonitor ? root.hyprMonitor.focused : true
 
         onWorkspaceActivated: function(workspaceId, side) {
-            if (!root.expanded && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
+            if (!root.expanded && !root.peeking && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
                 root.workspaceSlideDirection = side || "none";
                 root.peekingWorkspace = true;
                 wsTimer.restart();
@@ -301,7 +305,7 @@ PanelWindow {
                 root.workspaceSlideDirection = currentId > root._lastWsId ? "right" : (currentId < root._lastWsId ? "left" : "none");
                 root._lastWsId = currentId;
             }
-            if (!root.expanded && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
+            if (!root.expanded && !root.peeking && !root.peekingNotif && !root.peekingVolume && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peekingWorkspace = true;
                 wsTimer.restart();
             }
@@ -323,6 +327,7 @@ PanelWindow {
             if (!root._mediaReady)
                 return; // suppress startup peek
             if (mpris.playing && !root.wasPlayingBefore && !root.expanded
+                    && !root.peekingNotif && !root.peekingVolume && !root.peekingWorkspace
                     && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peeking = true;
                 root.page = "player";
@@ -337,6 +342,7 @@ PanelWindow {
             if (!root._mediaReady)
                 return; // suppress startup peek
             if (mpris.playing && !root.expanded
+                    && !root.peekingNotif && !root.peekingVolume && !root.peekingWorkspace
                     && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peeking = true;
                 root.page = "player";
@@ -355,7 +361,12 @@ PanelWindow {
     Connections {
         target: NotificationService
         function onNotificationAdded(n) {
-            if (!root.suppressPeek && !root.hideForFullscreen) {
+            // Never hijack an island the user is actively using: an incoming
+            // notification used to cover the open page and then force-collapse
+            // the island 4.5s later. If the island is expanded (or another peek
+            // is showing) the notification simply waits in the notifs page.
+            if (!root.expanded && !root.peeking && !root.peekingVolume && !root.peekingWorkspace
+                    && !root.suppressPeek && !root.hideForFullscreen) {
                 root.activeNotification = n;
                 root.peekingNotif = true;
                 notifTimer.restart();
@@ -366,7 +377,8 @@ PanelWindow {
     Connections {
         target: VolumeService
         function onVolumeUpdated(vol, isMuted) {
-            if (!root.expanded && !root.peekingNotif && !root.suppressPeek && !root.hideForFullscreen) {
+            if (!root.expanded && !root.peeking && !root.peekingNotif && !root.peekingWorkspace
+                    && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peekingVolume = true;
                 volTimer.restart();
             }
@@ -500,6 +512,7 @@ PanelWindow {
             if (root.peekingNotif) {
                 root.peekingNotif = false;
                 root.activeNotification = null;
+                root.notifExpanded = false;
                 root.setExpanded(false);
             }
         }
