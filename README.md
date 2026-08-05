@@ -247,6 +247,11 @@ hl.bind("SUPER + N", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/now
 hl.bind("SUPER + L", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle"))
 hl.bind("SUPER + SHIFT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_myglass.sh"))
+
+-- 🎵 Media keys (drive the island's MPRIS music player)
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("hyprctl dispatch global nowoward-capdynamic:play-pause"))
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("hyprctl dispatch global nowoward-capdynamic:next"))
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("hyprctl dispatch global nowoward-capdynamic:previous"))
 ```
 
 ### 📝 Legacy Setup (`hyprland.conf`)
@@ -262,6 +267,11 @@ bind = SUPER, N, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynami
 bind = SUPER, L, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call wlogout toggle
 bind = SUPER, SHIFT, W, exec, quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle
 bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/toggle_myglass.sh
+
+# 🎵 Media keys (drive the island's MPRIS music player)
+bind = , XF86AudioPlay, global, nowoward-capdynamic:play-pause
+bind = , XF86AudioNext, global, nowoward-capdynamic:next
+bind = , XF86AudioPrev, global, nowoward-capdynamic:previous
 ```
 
 ---

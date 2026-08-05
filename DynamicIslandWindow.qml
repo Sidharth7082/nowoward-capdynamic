@@ -260,11 +260,16 @@ PanelWindow {
     property bool peekingWorkspace: false
     property string workspaceSlideDirection: "none"
     property int _lastWsId: 1
+    // Suppresses auto-peek while the shell is still initializing (a player that
+    // is already playing must not pop the island on startup).
+    property bool _mediaReady: false
 
     Component.onCompleted: {
         root._lastWsId = root.hyprMonitor && root.hyprMonitor.activeWorkspace
             ? root.hyprMonitor.activeWorkspace.id
             : 1;
+        root.wasPlayingBefore = mpris.playing;
+        root._mediaReady = true;
     }
 
     CompositorWorkspaceTracker {
@@ -309,6 +314,8 @@ PanelWindow {
     Connections {
         target: mpris
         function onPlayingChanged() {
+            if (!root._mediaReady)
+                return; // suppress startup peek
             if (mpris.playing && !root.wasPlayingBefore && !root.expanded
                     && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peeking = true;
@@ -318,6 +325,43 @@ PanelWindow {
             }
             root.wasPlayingBefore = mpris.playing;
         }
+        function onTrackChanged() {
+            // Re-peek the music page whenever a new track starts (skipped while
+            // the island is already open or a peek is in progress).
+            if (!root._mediaReady)
+                return; // suppress startup peek
+            if (mpris.playing && !root.expanded
+                    && !root.suppressPeek && !root.hideForFullscreen) {
+                root.peeking = true;
+                root.page = "player";
+                root.expanded = true;
+                peekTimer.restart();
+            }
+        }
+    }
+
+    // Global media keys via Hyprland's global-shortcuts protocol (work
+    // regardless of focus). Wire them in hyprland.conf, e.g.:
+    //   bind = , XF86AudioPlay, global, nowoward-capdynamic:play-pause
+    //   bind = , XF86AudioNext, global, nowoward-capdynamic:next
+    //   bind = , XF86AudioPrev, global, nowoward-capdynamic:previous
+    GlobalShortcut {
+        appid: "nowoward-capdynamic"
+        name: "play-pause"
+        description: "Play/Pause media"
+        onPressed: mpris.playPause()
+    }
+    GlobalShortcut {
+        appid: "nowoward-capdynamic"
+        name: "next"
+        description: "Next track"
+        onPressed: mpris.next()
+    }
+    GlobalShortcut {
+        appid: "nowoward-capdynamic"
+        name: "previous"
+        description: "Previous track"
+        onPressed: mpris.previous()
     }
 
     Connections {
