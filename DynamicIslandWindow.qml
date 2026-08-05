@@ -45,9 +45,12 @@ PanelWindow {
             root.peeking = false;
             root.peekingNotif = false;
             root.peekingVolume = false;
+            root.peekingWorkspace = false;
+            root.workspaceSlideDirection = "none";
             peekTimer.stop();
             notifTimer.stop();
             volTimer.stop();
+            wsTimer.stop();
             leaveTimer.stop();
             idleTimer.stop();
         }
@@ -60,9 +63,12 @@ PanelWindow {
             root.peeking = false;
             root.peekingNotif = false;
             root.peekingVolume = false;
+            root.peekingWorkspace = false;
+            root.workspaceSlideDirection = "none";
             peekTimer.stop();
             notifTimer.stop();
             volTimer.stop();
+            wsTimer.stop();
             leaveTimer.stop();
             idleTimer.stop();
         }
@@ -340,29 +346,11 @@ PanelWindow {
         }
     }
 
-    // Global media keys via Hyprland's global-shortcuts protocol (work
-    // regardless of focus). Wire them in hyprland.conf, e.g.:
-    //   bind = , XF86AudioPlay, global, nowoward-capdynamic:play-pause
-    //   bind = , XF86AudioNext, global, nowoward-capdynamic:next
-    //   bind = , XF86AudioPrev, global, nowoward-capdynamic:previous
-    GlobalShortcut {
-        appid: "nowoward-capdynamic"
-        name: "play-pause"
-        description: "Play/Pause media"
-        onPressed: mpris.playPause()
-    }
-    GlobalShortcut {
-        appid: "nowoward-capdynamic"
-        name: "next"
-        description: "Next track"
-        onPressed: mpris.next()
-    }
-    GlobalShortcut {
-        appid: "nowoward-capdynamic"
-        name: "previous"
-        description: "Previous track"
-        onPressed: mpris.previous()
-    }
+    // Media-key entry points, driven by the single shell-level GlobalShortcut
+    // (see shell.qml). Kept on the window so keys act on the focused island.
+    function mediaPlayPause() { mpris.playPause(); }
+    function mediaNext() { mpris.next(); }
+    function mediaPrevious() { mpris.previous(); }
 
     Connections {
         target: NotificationService
@@ -610,6 +598,10 @@ PanelWindow {
 
             property real pressX: 0
             property bool dragging: false
+            // Which auto-peek was showing when the press started ("" if none):
+            // a plain click converts that peek into its full page instead of
+            // collapsing the island or opening the clock page.
+            property string wasPeeking: ""
 
             onEntered: {
                 leaveTimer.stop();
@@ -627,6 +619,13 @@ PanelWindow {
             onPressed: (mouse) => {
                 pressX = mouse.x;
                 dragging = false;
+                // Remember which auto-peek was showing so a plain click keeps
+                // the island open on that page instead of collapsing it.
+                wasPeeking = root.peeking ? "player"
+                    : root.peekingNotif ? "notifs"
+                    : root.peekingWorkspace ? "workspace"
+                    : root.peekingVolume ? "stats"
+                    : "";
                 leaveTimer.stop();
                 if (root.peeking) {
                     root.peeking = false;
@@ -655,8 +654,14 @@ PanelWindow {
                 const deltaX = mouse.x - pressX;
 
                 if (!root.expanded) {
-                    if (!dragging)
+                    if (!dragging) {
+                        // Opening from a peek: land on the page that was
+                        // peeking (notif/volume/workspace peeks aren't
+                        // "expanded"), otherwise open the clock page.
+                        if (gestureArea.wasPeeking !== "")
+                            root.page = gestureArea.wasPeeking;
                         root.setExpanded(true);
+                    }
                     return;
                 }
 
@@ -667,7 +672,13 @@ PanelWindow {
                         root.prevPage();
                     root.notifyActivity();
                 } else if (!dragging) {
-                    root.toggleExpanded();
+                    if (gestureArea.wasPeeking !== "") {
+                        // Convert the auto-peek into a persistent view instead
+                        // of collapsing it; keep the idle timer fresh.
+                        root.notifyActivity();
+                    } else {
+                        root.toggleExpanded();
+                    }
                 } else {
                     root.notifyActivity();
                 }

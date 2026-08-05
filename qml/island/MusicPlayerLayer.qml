@@ -1,9 +1,10 @@
 import QtQuick
 import Quickshell.Services.Mpris
+import "../theme"
 
-// Apple/Spotify-inspired now-playing card for the island.
-// Layout: album art + title/artist + visualizer, seek bar with hover/drag,
-// then transport controls flanked by shuffle/loop.
+// Clean now-playing card matching the original design language: compact album
+// art, purple title/artist, thin seek bar (with drag + hover thumb), and a
+// centered white transport cluster with shuffle/loop at the edges.
 Item {
     id: root
 
@@ -11,11 +12,8 @@ Item {
     property var userActivityCallback: null
     readonly property var mpris: controller
 
-    // Music accent palette (kept consistent with the island's purple identity).
     readonly property color accent: "#c084fc"
     readonly property color accentDim: "#9d7fce"
-    readonly property color bgFill: "#2a1538"
-    readonly property color textDim: "#9aa0a6"
 
     function notifyUserActivity() {
         if (userActivityCallback)
@@ -42,59 +40,31 @@ Item {
         }
     }
 
-    // ---- Full-bleed album-art background (Apple-Music style) ----
-    // Dimmed artwork fills the whole card behind the content. The capsule's
-    // clip + radius handle the rounded corners.
-    Image {
-        anchors.fill: parent
-        source: (mpris && mpris.hasPlayer && mpris.artUrl !== "") ? mpris.artUrl : ""
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        sourceSize: Qt.size(480, 240)
-        opacity: 0.32
-        visible: source !== ""
-    }
-    Rectangle {
-        anchors.fill: parent
-        color: "#0c0812"
-        opacity: 0.66
-        visible: mpris && mpris.hasPlayer && mpris.artUrl !== ""
-    }
-
     // ---- Empty state: nothing playing anywhere ----
     Column {
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 6
         visible: !mpris || !mpris.hasPlayer
 
-        Rectangle {
+        Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 44
-            height: 44
-            radius: 22
-            color: root.accent
-            opacity: 0.18
-
-            Text {
-                anchors.centerIn: parent
-                text: "♪"
-                color: root.accent
-                font.pixelSize: 20
-            }
+            text: "♪"
+            color: "#666666"
+            font.pixelSize: 22
         }
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Nothing playing"
-            color: "#999999"
-            font.pixelSize: 12
+            color: "#888888"
+            font.pixelSize: 13
         }
     }
 
     // ---- Now-playing state ----
     Column {
         anchors.fill: parent
-        anchors.margins: 7
-        spacing: 5
+        anchors.margins: 12
+        spacing: 8
         visible: !!mpris && mpris.hasPlayer
 
         // ── Header: album art, title/artist, visualizer ──
@@ -104,11 +74,11 @@ Item {
 
             Rectangle {
                 id: albumArt
-                width: 54
-                height: 54
-                radius: 13
-                color: root.bgFill
-                border.color: "#30ffffff"
+                width: 42
+                height: 42
+                radius: 9
+                color: "#3a2a4a"
+                border.color: "#33ffffff"
                 border.width: 1
                 clip: true
 
@@ -117,45 +87,28 @@ Item {
                     source: mpris.artUrl
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
-                    sourceSize: Qt.size(128, 128)
+                    sourceSize: Qt.size(96, 96)
                     visible: mpris.artUrl !== ""
                 }
 
-                // Placeholder when no art is available.
-                Rectangle {
-                    anchors.fill: parent
+                Text {
+                    anchors.centerIn: parent
                     visible: mpris.artUrl === ""
-                    color: "#2e1f40"
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "♪"
-                        color: root.accent
-                        font.pixelSize: 22
-                    }
-                }
-
-                // Live equalizer overlaid on the art's bottom-right corner.
-                MusicVisualizer {
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.rightMargin: 5
-                    anchors.bottomMargin: 5
-                    playing: mpris.playing
-                    barColor: "white"
-                    opacity: 0.95
+                    text: "♪"
+                    color: root.accent
+                    font.pixelSize: 18
                 }
             }
 
             Column {
-                width: parent.width - albumArt.width - 20
+                width: parent.width - albumArt.width - visualizer.width - 20
                 anchors.verticalCenter: albumArt.verticalCenter
-                spacing: 3
+                spacing: 2
 
                 Text {
                     width: parent.width
                     text: mpris.title !== "" ? mpris.title : mpris.sourceApp
-                    color: "#f5f5f7"
+                    color: root.accent
                     font.pixelSize: 15
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
@@ -167,6 +120,13 @@ Item {
                     font.pixelSize: 12
                     elide: Text.ElideRight
                 }
+            }
+
+            MusicVisualizer {
+                id: visualizer
+                anchors.verticalCenter: albumArt.verticalCenter
+                playing: mpris.playing
+                barColor: root.accent
             }
         }
 
@@ -180,16 +140,14 @@ Item {
 
                 Text {
                     text: root.formatTime(mpris.position)
-                    color: root.textDim
+                    color: Theme.subtext
                     font.pixelSize: 10
-                    font.weight: Font.Medium
                 }
-                Item { width: parent.width - 76; height: 1 }
+                Item { width: parent.width - 72; height: 1 }
                 Text {
                     text: root.formatTime(mpris.length)
-                    color: root.textDim
+                    color: Theme.subtext
                     font.pixelSize: 10
-                    font.weight: Font.Medium
                 }
             }
 
@@ -210,34 +168,32 @@ Item {
                 // Rail
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    height: 4
-                    radius: 2
-                    color: "#3a3a3a"
+                    height: 3
+                    radius: 1.5
+                    color: Theme.isMyGlass ? "#40ffffff" : "#3a3a3a"
                     width: parent.width
                 }
 
                 // Fill
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    height: 4
-                    radius: 2
-                    color: root.accent
+                    height: 3
+                    radius: 1.5
+                    color: "white"
                     width: parent.width * track.displayFraction
                 }
 
-                // Thumb — only shown while hovering or dragging
+                // Thumb — shown while hovering or dragging
                 Rectangle {
-                    width: 10
-                    height: 10
-                    radius: 5
+                    width: 8
+                    height: 8
+                    radius: 4
                     color: "white"
-                    border.color: root.accent
-                    border.width: 2
                     anchors.verticalCenter: parent.verticalCenter
                     x: Math.max(0, Math.min(parent.width - width,
                         parent.width * track.displayFraction - width / 2))
                     visible: seekArea.containsMouse || seekArea.pressed
-                    scale: seekArea.pressed ? 1.15 : 1
+                    scale: seekArea.pressed ? 1.2 : 1
                     Behavior on scale { NumberAnimation { duration: 100 } }
                 }
 
@@ -246,8 +202,6 @@ Item {
                     anchors.fill: parent
                     cursorShape: mpris && mpris.canSeek ? Qt.PointingHandCursor : Qt.ArrowCursor
                     hoverEnabled: mpris && mpris.canSeek
-                    // Disabled (not transparent) so unsupported players don't
-                    // swallow clicks, matching the transport buttons.
                     enabled: mpris && mpris.canSeek
                     preventStealing: true
 
@@ -282,7 +236,7 @@ Item {
         // ── Transport controls + shuffle/loop ──
         Item {
             width: parent.width
-            height: 44
+            height: 34
 
             // Shuffle (left edge)
             Item {
@@ -343,16 +297,16 @@ Item {
             // Transport cluster — centered
             Row {
                 anchors.centerIn: parent
-                spacing: 18
+                spacing: 24
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "⏮"
-                    color: mpris && mpris.canGoPrevious ? "#e8e8e8" : "#4a4a4a"
-                    font.pixelSize: 17
+                    color: mpris && mpris.canGoPrevious ? "white" : "#555555"
+                    font.pixelSize: 18
                     MouseArea {
                         anchors.fill: parent
-                        anchors.margins: -10
+                        anchors.margins: -12
                         cursorShape: Qt.PointingHandCursor
                         preventStealing: true
                         enabled: mpris && mpris.canGoPrevious
@@ -364,51 +318,35 @@ Item {
                     }
                 }
 
-                // Play / Pause with a soft accent halo
-                Item {
-                    width: 44
-                    height: 44
+                Rectangle {
+                    id: playBtn
+                    width: 34
+                    height: 34
+                    radius: 17
+                    color: "white"
+                    opacity: mpris && mpris.canControl ? 1 : 0.35
+                    scale: playArea.pressed ? 0.92 : (playArea.containsMouse ? 1.06 : 1.0)
+                    Behavior on scale { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
 
-                    Rectangle {
+                    Text {
                         anchors.centerIn: parent
-                        width: 40
-                        height: 40
-                        radius: 20
-                        color: root.accent
-                        opacity: (mpris && mpris.canControl ? 0.22 : 0.08)
+                        anchors.horizontalCenterOffset: (mpris && mpris.playing) ? 0 : 1
+                        text: (mpris && mpris.playing) ? "⏸" : "▶"
+                        color: "black"
+                        font.pixelSize: 14
+                        font.weight: Font.Bold
                     }
 
-                    Rectangle {
-                        id: playBtn
-                        anchors.centerIn: parent
-                        width: 36
-                        height: 36
-                        radius: 18
-                        color: root.accent
-                        opacity: mpris && mpris.canControl ? 1 : 0.3
-                        scale: playArea.pressed ? 0.92 : (playArea.containsMouse ? 1.06 : 1.0)
-                        Behavior on scale { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
-
-                        Text {
-                            anchors.centerIn: parent
-                            anchors.horizontalCenterOffset: (mpris && mpris.playing) ? 0 : 1
-                            text: (mpris && mpris.playing) ? "⏸" : "▶"
-                            color: "#1a1030"
-                            font.pixelSize: 13
-                            font.weight: Font.Bold
-                        }
-
-                        MouseArea {
-                            id: playArea
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            preventStealing: true
-                            enabled: mpris && mpris.canControl
-                            onPressed: function(mouse) { mouse.accepted = true; }
-                            onClicked: {
-                                mpris.playPause();
-                                root.notifyUserActivity();
-                            }
+                    MouseArea {
+                        id: playArea
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        preventStealing: true
+                        enabled: mpris && mpris.canControl
+                        onPressed: function(mouse) { mouse.accepted = true; }
+                        onClicked: {
+                            mpris.playPause();
+                            root.notifyUserActivity();
                         }
                     }
                 }
@@ -416,11 +354,11 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "⏭"
-                    color: mpris && mpris.canGoNext ? "#e8e8e8" : "#4a4a4a"
-                    font.pixelSize: 17
+                    color: mpris && mpris.canGoNext ? "white" : "#555555"
+                    font.pixelSize: 18
                     MouseArea {
                         anchors.fill: parent
-                        anchors.margins: -10
+                        anchors.margins: -12
                         cursorShape: Qt.PointingHandCursor
                         preventStealing: true
                         enabled: mpris && mpris.canGoNext

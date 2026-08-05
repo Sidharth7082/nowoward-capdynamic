@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import "qml/services"
 import "qml/wallpaperpicker"
@@ -36,13 +37,39 @@ Scope {
             const window = windows[index];
             if (window && !fallbackWindow)
                 fallbackWindow = window;
-            if (window && window.monitorFocused) {
+            if (window && window.hyprMonitor && window.hyprMonitor.focused) {
                 callback(window);
                 return;
             }
         }
         if (fallbackWindow)
             callback(fallbackWindow);
+    }
+
+    // Global media keys — registered ONCE at the shell level (not per-monitor,
+    // which would register duplicate global shortcuts and can crash the
+    // compositor). Route to the focused island window.
+    // Wire them in hyprland.conf, e.g.:
+    //   bind = , XF86AudioPlay, global, nowoward-capdynamic:play-pause
+    //   bind = , XF86AudioNext, global, nowoward-capdynamic:next
+    //   bind = , XF86AudioPrev, global, nowoward-capdynamic:previous
+    GlobalShortcut {
+        appid: "nowoward-capdynamic"
+        name: "play-pause"
+        description: "Play/Pause media"
+        onPressed: shellRoot.forFocusedWindow((window) => window.mediaPlayPause())
+    }
+    GlobalShortcut {
+        appid: "nowoward-capdynamic"
+        name: "next"
+        description: "Next track"
+        onPressed: shellRoot.forFocusedWindow((window) => window.mediaNext())
+    }
+    GlobalShortcut {
+        appid: "nowoward-capdynamic"
+        name: "previous"
+        description: "Previous track"
+        onPressed: shellRoot.forFocusedWindow((window) => window.mediaPrevious())
     }
 
     // quickshell ipc call island toggle / show / hide / player / clock / stats / logout
