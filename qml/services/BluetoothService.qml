@@ -7,11 +7,17 @@ QtObject {
 
     property bool enabled: false
     property bool serviceActive: true
+    property bool bluezInstalled: true
     property string statusText: "Checking..."
+    property string hintText: "" // actionable message shown under the start button
     property var deviceList: []
 
+    // Reports one of: not_installed / service_inactive / yes / no
     property var _procStatus: Process {
-        command: ["sh", "-c", "systemctl is-active --quiet bluetooth 2>/dev/null && (bluetoothctl show 2>/dev/null | grep 'Powered:' | awk '{print $2}' || echo 'no') || echo 'service_inactive'"]
+        command: ["sh", "-c",
+            "if ! command -v bluetoothd >/dev/null 2>&1 && ! systemctl cat bluetooth.service >/dev/null 2>&1; then echo 'not_installed';"
+            + " elif ! systemctl is-active --quiet bluetooth 2>/dev/null; then echo 'service_inactive';"
+            + " else bluetoothctl show 2>/dev/null | awk '/Powered:/{p=$2} END{print p}' || echo 'no'; fi"]
         running: false
         stdout: StdioCollector {
             id: _colStatus
@@ -21,11 +27,18 @@ QtObject {
             const text = _colStatus.text;
             if (!text) return;
             const p = text.trim().toLowerCase();
-            if (p === "service_inactive") {
+            if (p === "not_installed") {
+                root.bluezInstalled = false;
+                root.serviceActive = false;
+                root.enabled = false;
+                root.statusText = "Bluez not installed";
+            } else if (p === "service_inactive") {
+                root.bluezInstalled = true;
                 root.serviceActive = false;
                 root.enabled = false;
                 root.statusText = "Service Inactive";
             } else {
+                root.bluezInstalled = true;
                 root.serviceActive = true;
                 root.enabled = (p === "yes");
                 root.statusText = root.enabled ? "On" : "Off";
@@ -51,9 +64,39 @@ QtObject {
         running: false
     }
 
+    // Starts the Bluez daemon through every privilege path we have. Starting a
+    // system service needs root, and quickshell-spawned processes have no
+    // interactive terminal — so without a polkit agent or passwordless sudo
+    // this fails, and the UI tells the user the exact command to run instead
+    // of silently doing nothing.
     property var _procStartService: Process {
-        command: ["sh", "-c", "pkexec systemctl enable --now bluetooth 2>/dev/null || systemctl start bluetooth"]
+        command: ["sh", "-c",
+            "if command -v bluetoothd >/dev/null 2>&1 || systemctl cat bluetooth.service >/dev/null 2>&1; then"
+            + " if timeout 30 pkexec systemctl enable --now bluetooth 2>/dev/null"
+            + " || timeout 10 sudo -n systemctl enable --now bluetooth 2>/dev/null"
+            + " || timeout 10 systemctl enable --now bluetooth 2>/dev/null; then echo started; else echo failed; fi;"
+            + " else echo not_installed; fi"]
         running: false
+        stdout: StdioCollector {
+            id: _colStart
+            waitForEnd: true
+        }
+        onExited: {
+            const p = _colStart.text.trim();
+            if (p === "started") {
+                root.statusText = "Starting daemon…";
+                root.hintText = "";
+                // Re-check right away instead of waiting for the 4s poller.
+                if (!root._procStatus.running)
+                    root._procStatus.running = true;
+            } else if (p === "not_installed") {
+                root.hintText = "Install: sudo pacman -S bluez bluez-utils";
+            } else {
+                root.hintText = root.bluezInstalled
+                    ? "Run: sudo systemctl enable --now bluetooth"
+                    : "Install: sudo pacman -S bluez bluez-utils";
+            }
+        }
     }
 
     property var _procSettings: Process {

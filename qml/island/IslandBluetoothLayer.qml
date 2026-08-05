@@ -178,7 +178,9 @@ Item {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Bluetooth Service (BlueZ) is stopped"
+                    text: BluetoothService.bluezInstalled
+                        ? "Bluetooth Service (BlueZ) is stopped"
+                        : "BlueZ is not installed"
                     color: "#ef4444"
                     font.pixelSize: 11
                     font.weight: Font.Bold
@@ -203,6 +205,19 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: BluetoothService.startService()
                     }
+                }
+
+                // Actionable hint when the automatic start can't get root
+                // (no polkit agent / no passwordless sudo).
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 190
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    text: BluetoothService.hintText
+                    color: "#fbbf24"
+                    font.pixelSize: 10
+                    visible: BluetoothService.hintText !== ""
                 }
             }
         }

@@ -27,12 +27,29 @@ QtObject {
         running: false
     }
 
+    // Debounce: a slider drag calls setVolume on every mouse move; queue the
+    // target and spawn the wpctl process at most once per 60ms instead of
+    // spawn-and-killing dozens of processes per drag.
+    property real _setPending: -1
+    property var _setTimer: Timer {
+        interval: 60
+        repeat: false
+        onTriggered: {
+            if (root._setPending >= 0) {
+                const p = root._setPending;
+                root._setPending = -1;
+                root._setProc.command = ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (p / 100.0).toFixed(2)];
+                root._setProc.running = false;
+                root._setProc.running = true;
+            }
+        }
+    }
+
     function setVolume(percent) {
         let p = Math.min(100, Math.max(0, Math.round(percent)));
-        root.volume = p;
-        root._setProc.command = ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (p / 100.0).toFixed(2)];
-        root._setProc.running = false;
-        root._setProc.running = true;
+        root.volume = p; // optimistic UI update
+        root._setPending = p;
+        root._setTimer.restart();
     }
 
     property var _timer: Timer {

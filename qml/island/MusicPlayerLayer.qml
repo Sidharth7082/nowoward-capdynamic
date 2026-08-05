@@ -83,17 +83,21 @@ Item {
                 clip: true
 
                 Image {
+                    id: artImg
                     anchors.fill: parent
                     source: mpris.artUrl
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     sourceSize: Qt.size(96, 96)
-                    visible: mpris.artUrl !== ""
+                    // Hide if there's no art OR the URL can't be loaded (e.g.
+                    // Chromium's temp art file is already gone) — the ♪
+                    // placeholder below then shows instead of a blank box.
+                    visible: mpris.artUrl !== "" && status !== Image.Error
                 }
 
                 Text {
                     anchors.centerIn: parent
-                    visible: mpris.artUrl === ""
+                    visible: mpris.artUrl === "" || artImg.status === Image.Error
                     text: "♪"
                     color: root.accent
                     font.pixelSize: 18

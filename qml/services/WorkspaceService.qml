@@ -14,7 +14,7 @@ QtObject {
     property var windowsByWorkspace: ({})
 
     property var _wallpaperProc: Process {
-        command: ["sh", "-c", "awww query 2>/dev/null | sed -n 's/.*image: //p' | head -n 1 || swww query 2>/dev/null | sed -n 's/.*image: //p' | head -n 1"]
+        command: ["sh", "-c", "(awww query 2>/dev/null || swww query 2>/dev/null) | sed -n 's/.*image: //p' | head -n 1"]
         running: false
         stdout: StdioCollector {
             id: _colWallpaper

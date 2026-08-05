@@ -68,13 +68,19 @@ Item {
     function copySelected() {
         if (filteredEntries.length === 0) return;
         let entry = filteredEntries[selectedIndex];
-        copyProc.command = ["sh", "-c", "cliphist decode \"" + entry.id + "\" | wl-copy"];
+        // Use the helper script: it decodes by id and sets the correct MIME
+        // type for images (wl-copy -t image/png) instead of plain text.
+        copyProc.command = ["sh", "-c", "\"$1\" \"$2\"", "--", root.scriptPath, entry.id];
         if (!copyProc.running) copyProc.running = true;
         root.hide();
     }
 
     function deleteSelected() {
         if (filteredEntries.length === 0) return;
+        // Ignore rapid re-presses while a delete is animating; otherwise the
+        // second keypress overwrites removeTimer.entryId and the first entry
+        // gets deleted from cliphist but never removed from the model.
+        if (holdRedTimer.running || removeTimer.running) return;
         let entry = filteredEntries[selectedIndex];
         root.deletingId = entry.id;
         deleteProc.command = ["sh", "-c", "printf '%s\\t' \"$1\" | cliphist delete", "_", entry.id];

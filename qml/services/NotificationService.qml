@@ -76,8 +76,11 @@ NotificationServer {
 
     function dismissLatest() {
         if (root.latestNotification) {
-            const source = root.latestNotification.source;
+            const item = root.latestNotification;
+            const source = item.source;
             if (source && source.dismiss) source.dismiss();
+            // Also drop it from the island history, not just the active toast.
+            root.history = root.history.filter(function(x) { return x.id !== item.id; });
             root.latestNotification = null;
         }
     }
