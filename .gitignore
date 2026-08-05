@@ -1,0 +1,6 @@
+# Stray cache directory created if a "file://"-prefixed path is ever used as a
+# filesystem path (see qml/wallpaperpicker/WallpaperPickerPanel.qml localPath()).
+file:
+
+# Local thumbnail cache (should live under ~/.cache, not in the repo)
+.cache/
