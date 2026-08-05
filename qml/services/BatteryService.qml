@@ -9,19 +9,20 @@ QtObject {
     property bool present: true
     property int percentage: 100
     property bool charging: false
+    property bool plugged: false
 
     property bool _initialized: false
-    property bool _prevCharging: false
+    property bool _prevPlugged: false
 
-    onChargingChanged: {
+    onPluggedChanged: {
         if (!_initialized) {
             _initialized = true;
-            _prevCharging = charging;
+            _prevPlugged = plugged;
             return;
         }
-        if (charging !== _prevCharging) {
-            _prevCharging = charging;
-            if (charging) {
+        if (plugged !== _prevPlugged) {
+            _prevPlugged = plugged;
+            if (plugged) {
                 NotificationService.pushCustom({
                     appName: "Power",
                     summary: "⚡ Charger Connected",
@@ -59,16 +60,21 @@ QtObject {
     function _parse(text) {
         if (!text) return
         var parts = text.trim().split("|")
-        if (parts.length >= 1) {
-            var val = parseInt(parts[0])
-            if (!isNaN(val) && val > 0) {
-                root.present = true
+        var val = parts.length >= 1 ? parseInt(parts[0]) : NaN
+        if (!isNaN(val)) {
+            root.present = true
+            if (val > 0)
                 root.percentage = val
-            }
+        } else {
+            root.present = false
         }
         if (parts.length >= 2) {
             var st = parts[1].toLowerCase()
-            root.charging = (st === "charging" || st === "full")
+            root.charging = (st === "charging")
+            root.plugged = (st === "charging" || st === "full")
+        } else {
+            root.charging = false
+            root.plugged = false
         }
     }
 }

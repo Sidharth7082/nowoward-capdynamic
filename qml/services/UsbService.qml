@@ -35,10 +35,12 @@ QtObject {
             const devices = data.blockdevices || []
             const currentMap = {}
 
-            function checkDevice(dev) {
+            function checkDevice(dev, parentIsUsb) {
                 if (!dev) return
-                const isUsb = (dev.tran === "usb") || (dev.rm === true) || (dev.rm === 1) || (dev.rm === "1")
-                if (isUsb) {
+                const isUsb = parentIsUsb || (dev.tran === "usb") || (dev.rm === true) || (dev.rm === 1) || (dev.rm === "1")
+                // Only track the top-level removable device. Partitions of a USB
+                // stick (e.g. sdb + sdb1) would otherwise each fire a notification.
+                if (isUsb && !parentIsUsb) {
                     const id = dev.name
                     const model = dev.model ? dev.model.trim() : "USB Storage"
                     const size = dev.size ? dev.size.trim() : ""
@@ -48,13 +50,13 @@ QtObject {
                 }
                 if (dev.children && dev.children.length > 0) {
                     for (let c = 0; c < dev.children.length; c++) {
-                        checkDevice(dev.children[c])
+                        checkDevice(dev.children[c], isUsb)
                     }
                 }
             }
 
             for (let i = 0; i < devices.length; i++) {
-                checkDevice(devices[i])
+                checkDevice(devices[i], false)
             }
 
             if (!root.initialized) {

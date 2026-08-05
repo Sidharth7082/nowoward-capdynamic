@@ -70,7 +70,7 @@ Item {
     function copySelected() {
         if (filteredEntries.length === 0) return;
         let entry = filteredEntries[selectedIndex];
-        copyProc.command = ["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"];
+        copyProc.command = ["sh", "-c", "cliphist decode \"" + entry.id + "\" | wl-copy"];
         copyProc.running = false;
         copyProc.running = true;
         root.hide();

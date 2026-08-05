@@ -127,7 +127,8 @@ PanelWindow {
     }
 
     function nextPage() {
-        const idx = pages.indexOf(root.page);
+        let idx = pages.indexOf(root.page);
+        if (idx === -1) idx = 0;
         root.page = pages[(idx + 1) % pages.length];
     }
 
@@ -260,6 +261,12 @@ PanelWindow {
     property string workspaceSlideDirection: "none"
     property int _lastWsId: 1
 
+    Component.onCompleted: {
+        root._lastWsId = root.hyprMonitor && root.hyprMonitor.activeWorkspace
+            ? root.hyprMonitor.activeWorkspace.id
+            : 1;
+    }
+
     CompositorWorkspaceTracker {
         id: workspaceTracker
         hyprMonitor: root.hyprMonitor
@@ -343,13 +350,6 @@ PanelWindow {
                 root.expanded = false;
             }
         }
-    }
-
-    Shortcut {
-        sequences: ["Esc", "Escape"]
-        enabled: root.expanded
-        context: Qt.ApplicationShortcut
-        onActivated: root.setExpanded(false)
     }
 
     Shortcut {
@@ -514,7 +514,6 @@ PanelWindow {
         clip: true
         scale: gestureArea.containsPress ? 0.975 : (gestureArea.containsMouse ? 1.012 : 1.0)
         focus: root.expanded
-        Keys.onEscapePressed: root.setExpanded(false)
         Keys.onPressed: function(event) {
             if (event.key === Qt.Key_Escape) {
                 root.setExpanded(false);

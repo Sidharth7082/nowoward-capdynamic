@@ -171,7 +171,7 @@ Item {
             property bool iconLoadFailed: false
 
             anchors.centerIn: parent
-            visible: false
+            visible: root.compactMode && !iconLoadFailed && root.iconPath !== ""
             source: root.compactMode && !iconLoadFailed ? root.iconPath : ""
             width: iconSize
             height: iconSize

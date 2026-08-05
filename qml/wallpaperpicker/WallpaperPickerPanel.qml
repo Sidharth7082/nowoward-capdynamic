@@ -19,7 +19,11 @@ Item {
     id: root
 
     property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    property string cacheDir: localPath(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation)) + "/quickshell/nowoward-capdynamic/wallpaper-picker"
+    property string cacheDir: {
+        const base = localPath(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation));
+        return (base && base !== "" ? base : (Quickshell.env("HOME") + "/.cache"))
+            + "/quickshell/nowoward-capdynamic/wallpaper-picker"
+    }
 
     property bool shown: false
     property string activeWallpaper: ""
@@ -27,7 +31,12 @@ Item {
     readonly property var videoExts: ["mp4", "mkv", "webm", "MP4", "MKV", "WEBM"]
 
     function localPath(v) {
-        return v && v.toLocalFile ? v.toLocalFile() : String(v);
+        if (!v) return "";
+        if (v.toLocalFile) return v.toLocalFile();
+        // Some Qt versions return a "file:///..." URL string instead of a plain
+        // path. Collapse the scheme + slashes into a single leading "/" so the
+        // result stays an absolute filesystem path (e.g. "/home/user/.cache").
+        return String(v).replace(/^file:\/\/+/, "/");
     }
 
     function toggle() {
@@ -73,7 +82,7 @@ Item {
                         isVideo: isVid,
                         cachePath: cpath,
                         thumbPath: "file://" + cpath,
-                        thumbReady: true
+                        thumbReady: false // cache file not confirmed on disk yet
                     };
                 });
 
@@ -83,6 +92,7 @@ Item {
 
             if (wallpapers.count > 0) {
                 carousel.currentIndex = 0;
+                root.ensureVisibleThumbnails();
             }
 
             bgThumbGen.running = false;
@@ -124,6 +134,13 @@ Item {
 
         thumbQueue.push(index);
         pumpThumbQueue();
+    }
+
+    // Queue thumbnails for the cards currently visible in the carousel.
+    function ensureVisibleThumbnails() {
+        const idx = carousel.currentIndex;
+        for (let i = Math.max(0, idx - 2); i <= Math.min(wallpapers.count - 1, idx + 2); i++)
+            root.ensureThumbnail(i);
     }
 
     function pumpThumbQueue() {
@@ -258,6 +275,8 @@ Item {
                 visible: wallpapers.count > 0
                 clip: false
 
+                onCurrentIndexChanged: root.ensureVisibleThumbnails()
+
                 pathItemCount: Math.min(wallpapers.count, 5)
                 cacheItemCount: 4
                 snapMode: PathView.SnapToItem
@@ -322,11 +341,38 @@ Item {
                                 id: imgCard
                                 anchors.fill: parent
 
-                                source: model.thumbPath
+                                // When the cached thumbnail is missing we fall back to the
+                                // original file. Kept as a property (not an assignment) so the
+                                // source binding is never broken when PathView recycles delegates.
+                                property bool thumbFailed: false
+
+                                source: thumbFailed ? ("file://" + model.filePath) : model.thumbPath
 
                                 onStatusChanged: {
-                                    if (status === Image.Error && source !== ("file://" + model.filePath)) {
-                                        source = "file://" + model.filePath;
+                                    if (status === Image.Ready) {
+                                        if (source === model.thumbPath) {
+                                            thumbFailed = false;
+                                            thumbRetryTimer.stop();
+                                        }
+                                    } else if (status === Image.Error) {
+                                        if (source === model.thumbPath) {
+                                            // Thumbnail not generated yet — show the original
+                                            // while polling for the cached .jpg to appear.
+                                            thumbFailed = true;
+                                            thumbRetryTimer.restart();
+                                        }
+                                    }
+                                }
+
+                                Timer {
+                                    id: thumbRetryTimer
+                                    interval: 1200
+                                    repeat: true
+                                    onTriggered: {
+                                        if (imgCard.thumbFailed)
+                                            imgCard.thumbFailed = false; // re-attempt thumbnail
+                                        else
+                                            stop();
                                     }
                                 }
 

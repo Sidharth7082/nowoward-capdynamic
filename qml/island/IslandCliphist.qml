@@ -60,7 +60,7 @@ Item {
     function copySelected() {
         if (filteredEntries.length === 0) return;
         let entry = filteredEntries[selectedIndex];
-        Quickshell.execDetached(["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"]);
+        Quickshell.execDetached(["sh", "-c", "cliphist decode \"" + entry.id + "\" | wl-copy"]);
         root.closeRequested();
     }
 

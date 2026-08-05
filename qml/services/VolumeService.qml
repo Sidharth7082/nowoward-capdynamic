@@ -49,12 +49,20 @@ QtObject {
         let vol = root.volume;
 
         if (text.includes("Volume:")) {
-            const parts = text.trim().split(/\s+/);
-            for (let i = 0; i < parts.length; i++) {
-                let num = parseFloat(parts[i]);
-                if (!isNaN(num) && num <= 2.0) {
-                    vol = Math.round(num * 100);
-                    break;
+            if (text.includes("%")) {
+                // pactl style: "Volume: front-left: 65536 / 100% / 0.00 dB, ..."
+                const m = text.match(/(\d+(?:\.\d+)?)\s*%/);
+                if (m)
+                    vol = Math.min(100, Math.max(0, Math.round(parseFloat(m[1]))));
+            } else {
+                // wpctl style: "Volume: 0.50 [MUTED]" — first number in the 0..1 range
+                const parts = text.trim().split(/\s+/);
+                for (let i = 0; i < parts.length; i++) {
+                    let num = parseFloat(parts[i]);
+                    if (!isNaN(num) && num <= 2.0) {
+                        vol = Math.round(num * 100);
+                        break;
+                    }
                 }
             }
         }
