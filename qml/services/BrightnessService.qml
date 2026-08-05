@@ -11,14 +11,17 @@ QtObject {
         command: ["sh", "-c", "brightnessctl -m 2>/dev/null || echo ',,75%'"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: (text) => {
-                if (!text) return;
-                const parts = text.trim().split(",");
-                if (parts.length >= 4) {
-                    const pctStr = parts[3].replace("%", "").trim();
-                    const val = parseInt(pctStr);
-                    if (!isNaN(val)) root.brightness = val;
-                }
+            id: _colBriGet
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colBriGet.text;
+            if (!text) return;
+            const parts = text.trim().split(",");
+            if (parts.length >= 4) {
+                const pctStr = parts[3].replace("%", "").trim();
+                const val = parseInt(pctStr);
+                if (!isNaN(val)) root.brightness = val;
             }
         }
     }
@@ -42,8 +45,7 @@ QtObject {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root._procGet.running = false;
-            root._procGet.running = true;
+            if (!root._procGet.running) root._procGet.running = true;
         }
     }
 }

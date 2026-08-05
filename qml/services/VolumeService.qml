@@ -13,9 +13,12 @@ QtObject {
         command: ["sh", "-c", "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null || echo 'Volume: 0.50'"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: (text) => {
-                root._parse(text);
-            }
+            id: _colVolGet
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colVolGet.text;
+            root._parse(text);
         }
     }
 
@@ -38,8 +41,7 @@ QtObject {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root._proc.running = false;
-            root._proc.running = true;
+            if (!root._proc.running) root._proc.running = true;
         }
     }
 

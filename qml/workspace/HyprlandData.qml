@@ -31,16 +31,20 @@ Item {
         command: ["hyprctl", "clients", "-j"]
         running: false
         stdout: StdioCollector {
-            id: clientsCollector
-            onStreamFinished: {
-                root.clientsRequestRunning = false;
-                if (clientsCollector.text && clientsCollector.text.trim().length > 0) {
-                    root.windowList = root.parseJson(clientsCollector.text, []);
-                    root.rebuildWindowIndex();
-                    root.clientsReady = true;
-                }
-                root.flushRefresh();
+            id: _colClients
+            waitForEnd: true
+        }
+        // onStreamFinished is never emitted in some Quickshell builds — collect
+        // the full stream and parse on exit instead.
+        onExited: {
+            const text = _colClients.text;
+            root.clientsRequestRunning = false;
+            if (text && text.trim().length > 0) {
+                root.windowList = root.parseJson(text, []);
+                root.rebuildWindowIndex();
+                root.clientsReady = true;
             }
+            root.flushRefresh();
         }
     }
 
@@ -48,15 +52,19 @@ Item {
         command: ["hyprctl", "monitors", "-j"]
         running: false
         stdout: StdioCollector {
-            id: monitorsCollector
-            onStreamFinished: {
-                root.monitorsRequestRunning = false;
-                if (monitorsCollector.text && monitorsCollector.text.trim().length > 0) {
-                    root.monitors = root.parseJson(monitorsCollector.text, []);
-                    root.monitorsReady = true;
-                }
-                root.flushRefresh();
+            id: _colMonitors
+            waitForEnd: true
+        }
+        // onStreamFinished is never emitted in some Quickshell builds — collect
+        // the full stream and parse on exit instead.
+        onExited: {
+            const text = _colMonitors.text;
+            root.monitorsRequestRunning = false;
+            if (text && text.trim().length > 0) {
+                root.monitors = root.parseJson(text, []);
+                root.monitorsReady = true;
             }
+            root.flushRefresh();
         }
     }
 
@@ -64,16 +72,20 @@ Item {
         command: ["hyprctl", "workspaces", "-j"]
         running: false
         stdout: StdioCollector {
-            id: workspacesCollector
-            onStreamFinished: {
-                root.workspacesRequestRunning = false;
-                if (workspacesCollector.text && workspacesCollector.text.trim().length > 0) {
-                    const rawWorkspaces = root.parseJson(workspacesCollector.text, []);
-                    root.workspaces = rawWorkspaces.filter((workspace) => workspace.id >= 1 && workspace.id <= 100);
-                    root.workspacesReady = true;
-                }
-                root.flushRefresh();
+            id: _colWorkspaces
+            waitForEnd: true
+        }
+        // onStreamFinished is never emitted in some Quickshell builds — collect
+        // the full stream and parse on exit instead.
+        onExited: {
+            const text = _colWorkspaces.text;
+            root.workspacesRequestRunning = false;
+            if (text && text.trim().length > 0) {
+                const rawWorkspaces = root.parseJson(text, []);
+                root.workspaces = rawWorkspaces.filter((workspace) => workspace.id >= 1 && workspace.id <= 100);
+                root.workspacesReady = true;
             }
+            root.flushRefresh();
         }
     }
 
@@ -81,15 +93,19 @@ Item {
         command: ["hyprctl", "activeworkspace", "-j"]
         running: false
         stdout: StdioCollector {
-            id: activeWorkspaceCollector
-            onStreamFinished: {
-                root.activeWorkspaceRequestRunning = false;
-                if (activeWorkspaceCollector.text && activeWorkspaceCollector.text.trim().length > 0) {
-                    root.activeWorkspace = root.parseJson(activeWorkspaceCollector.text, null);
-                    root.activeWorkspaceReady = true;
-                }
-                root.flushRefresh();
+            id: _colActiveWorkspace
+            waitForEnd: true
+        }
+        // onStreamFinished is never emitted in some Quickshell builds — collect
+        // the full stream and parse on exit instead.
+        onExited: {
+            const text = _colActiveWorkspace.text;
+            root.activeWorkspaceRequestRunning = false;
+            if (text && text.trim().length > 0) {
+                root.activeWorkspace = root.parseJson(text, null);
+                root.activeWorkspaceReady = true;
             }
+            root.flushRefresh();
         }
     }
 

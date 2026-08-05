@@ -42,7 +42,12 @@ QtObject {
         command: ["sh", "-c", "cap=$(cat /sys/class/power_supply/BAT0/capacity /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n 1); stat=$(cat /sys/class/power_supply/BAT0/status /sys/class/power_supply/BAT*/status 2>/dev/null | head -n 1); echo \"$cap|$stat\""]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: root._parse(text)
+            id: _colBatGet
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colBatGet.text;
+            root._parse(text)
         }
     }
 
@@ -52,8 +57,8 @@ QtObject {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root._proc.running = false
-            root._proc.running = true
+            if (!root._proc.running)
+                root._proc.running = true
         }
     }
 

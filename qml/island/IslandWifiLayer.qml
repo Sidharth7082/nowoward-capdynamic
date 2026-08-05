@@ -9,9 +9,9 @@ Item {
 
     anchors.fill: parent
 
-    Component.onCompleted: NetworkService.scanNetworks()
+    Component.onCompleted: NetworkService.scanNetworks(true)
     onVisibleChanged: {
-        if (visible) NetworkService.scanNetworks();
+        if (visible) NetworkService.scanNetworks(true);
     }
 
     Column {
@@ -200,7 +200,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: NetworkService.scanNetworks()
+                    onClicked: NetworkService.scanNetworks(true)
                 }
             }
 

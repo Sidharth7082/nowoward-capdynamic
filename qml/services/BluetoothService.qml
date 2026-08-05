@@ -14,18 +14,21 @@ QtObject {
         command: ["sh", "-c", "systemctl is-active --quiet bluetooth 2>/dev/null && (bluetoothctl show 2>/dev/null | grep 'Powered:' | awk '{print $2}' || echo 'no') || echo 'service_inactive'"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: (text) => {
-                if (!text) return;
-                const p = text.trim().toLowerCase();
-                if (p === "service_inactive") {
-                    root.serviceActive = false;
-                    root.enabled = false;
-                    root.statusText = "Service Inactive";
-                } else {
-                    root.serviceActive = true;
-                    root.enabled = (p === "yes");
-                    root.statusText = root.enabled ? "On" : "Off";
-                }
+            id: _colStatus
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colStatus.text;
+            if (!text) return;
+            const p = text.trim().toLowerCase();
+            if (p === "service_inactive") {
+                root.serviceActive = false;
+                root.enabled = false;
+                root.statusText = "Service Inactive";
+            } else {
+                root.serviceActive = true;
+                root.enabled = (p === "yes");
+                root.statusText = root.enabled ? "On" : "Off";
             }
         }
     }
@@ -34,9 +37,12 @@ QtObject {
         command: ["sh", "-c", "bluetoothctl devices 2>/dev/null || echo ''"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: (text) => {
-                root._parseDevices(text);
-            }
+            id: _colDevices
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colDevices.text;
+            root._parseDevices(text);
         }
     }
 
@@ -56,7 +62,7 @@ QtObject {
     }
 
     function startService() {
-        root._procStartService.running = false;
+        if (root._procStartService.running) return; // don't kill an in-flight start
         root._procStartService.running = true;
     }
 
@@ -69,20 +75,21 @@ QtObject {
         root.enabled = !root.enabled;
         root.statusText = root.enabled ? "On" : "Off";
         root._procToggle.command = ["sh", "-c", "bluetoothctl " + nextState];
-        root._procToggle.running = false;
-        root._procToggle.running = true;
+        if (!root._procToggle.running)
+            root._procToggle.running = true;
     }
 
     function scanDevices() {
         if (!root.serviceActive) return;
-        root._procDevices.running = false;
+        // Never kill an in-flight scan — the 4s poller would starve it.
+        if (root._procDevices.running) return;
         root._procDevices.running = true;
     }
 
     function openSettings() {
         root._procSettings.command = ["sh", "-c", "systemctl is-active --quiet bluetooth || (pkexec systemctl enable --now bluetooth 2>/dev/null); blueman-manager 2>/dev/null || gnome-control-center bluetooth 2>/dev/null || kitty -e bluetoothctl 2>/dev/null || bluetoothctl"];
-        root._procSettings.running = false;
-        root._procSettings.running = true;
+        if (!root._procSettings.running)
+            root._procSettings.running = true;
     }
 
     function _parseDevices(raw) {
@@ -114,8 +121,8 @@ QtObject {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root._procStatus.running = false;
-            root._procStatus.running = true;
+            if (!root._procStatus.running)
+                root._procStatus.running = true;
             if (root.serviceActive)
                 root.scanDevices();
         }

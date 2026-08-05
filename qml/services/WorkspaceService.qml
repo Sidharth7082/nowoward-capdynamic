@@ -17,13 +17,15 @@ QtObject {
         command: ["sh", "-c", "awww query 2>/dev/null | sed -n 's/.*image: //p' | head -n 1 || swww query 2>/dev/null | sed -n 's/.*image: //p' | head -n 1"]
         running: false
         stdout: StdioCollector {
-            id: wallpaperCollector
-            onStreamFinished: {
-                if (wallpaperCollector.text && wallpaperCollector.text.trim().length > 0) {
-                    const wp = wallpaperCollector.text.trim();
-                    if (wp !== root.activeWallpaper)
-                        root.activeWallpaper = wp;
-                }
+            id: _colWallpaper
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colWallpaper.text;
+            if (text && text.trim().length > 0) {
+                const wp = text.trim();
+                if (wp !== root.activeWallpaper)
+                    root.activeWallpaper = wp;
             }
         }
     }
@@ -32,11 +34,13 @@ QtObject {
         command: ["hyprctl", "clients", "-j"]
         running: false
         stdout: StdioCollector {
-            id: clientCollector
-            onStreamFinished: {
-                if (clientCollector.text)
-                    root._parseClients(clientCollector.text);
-            }
+            id: _colClients
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colClients.text;
+            if (text)
+                root._parseClients(text);
         }
     }
 

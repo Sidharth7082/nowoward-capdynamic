@@ -13,7 +13,14 @@ QtObject {
         command: ["sh", "-c", "lsblk -o NAME,TRAN,RM,MODEL,SIZE,LABEL -J 2>/dev/null || echo '{\"blockdevices\":[]}'"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: root._parse(text)
+            id: _colUsb
+            waitForEnd: true
+        }
+        // Stream-end events are not emitted reliably in some Quickshell builds —
+        // collect the full stream and parse on exit instead.
+        onExited: {
+            const text = _colUsb.text;
+            root._parse(text)
         }
     }
 
@@ -23,8 +30,8 @@ QtObject {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            root._proc.running = false
-            root._proc.running = true
+            if (!root._proc.running)
+                root._proc.running = true
         }
     }
 

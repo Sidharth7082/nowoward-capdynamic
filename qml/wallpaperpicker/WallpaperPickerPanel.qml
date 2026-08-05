@@ -54,8 +54,7 @@ Item {
     // ── Scan the wallpaper directory ─────────────────────────────────────
     function rescan() {
         scanBuffer = "";
-        scanProcess.running = false;
-        scanProcess.running = true;
+        if (!scanProcess.running) scanProcess.running = true;
     }
 
     property string scanBuffer: ""
@@ -95,8 +94,7 @@ Item {
                 root.ensureVisibleThumbnails();
             }
 
-            bgThumbGen.running = false;
-            bgThumbGen.running = true;
+            if (!bgThumbGen.running) bgThumbGen.running = true;
         }
     }
 

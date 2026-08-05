@@ -49,12 +49,8 @@ Item {
     property string scriptPath: String(Qt.resolvedUrl("../../scripts/cliphist-img.sh")).replace("file://", "")
 
     function refresh() {
-        listProc.running = false;
-        listCountProc.running = false;
-        Qt.callLater(() => {
-            listProc.running = true;
-            listCountProc.running = true;
-        });
+        if (!listProc.running) listProc.running = true;
+        if (!listCountProc.running) listCountProc.running = true;
     }
 
     function copySelected() {
@@ -119,25 +115,28 @@ Item {
         command: ["bash", "-c", root.scriptPath]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: {
-                let lines = this.text.split("\n").filter(l => l.length > 0);
-                root.entries = lines.map(line => {
-                    let tabIdx = line.indexOf("\t");
-                    if (tabIdx === -1) return { id: "0", label: line, imagePath: "" };
-                    let id = line.substring(0, tabIdx);
-                    let rest = line.substring(tabIdx + 1);
+            id: _colList
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colList.text;
+            let lines = text.split("\n").filter(l => l.length > 0);
+            root.entries = lines.map(line => {
+                let tabIdx = line.indexOf("\t");
+                if (tabIdx === -1) return { id: "0", label: line, imagePath: "" };
+                let id = line.substring(0, tabIdx);
+                let rest = line.substring(tabIdx + 1);
 
-                    let nullIdx = rest.indexOf("\x00");
-                    if (nullIdx !== -1) {
-                        let label = rest.substring(0, nullIdx);
-                        let iconPart = rest.substring(nullIdx + 1);
-                        let imgPath = iconPart.split("\x1f")[1] || "";
-                        return { id: id, label: label, imagePath: imgPath };
-                    }
+                let nullIdx = rest.indexOf("\x00");
+                if (nullIdx !== -1) {
+                    let label = rest.substring(0, nullIdx);
+                    let iconPart = rest.substring(nullIdx + 1);
+                    let imgPath = iconPart.split("\x1f")[1] || "";
+                    return { id: id, label: label, imagePath: imgPath };
+                }
 
-                    return { id: id, label: rest, imagePath: "" };
-                });
-            }
+                return { id: id, label: rest, imagePath: "" };
+            });
         }
     }
 
@@ -146,9 +145,12 @@ Item {
         command: ["sh", "-c", "cliphist list | wc -l"]
         running: false
         stdout: StdioCollector {
-            onStreamFinished: {
-                listCountText.total = parseInt(this.text.trim()) || 0;
-            }
+            id: _colListCount
+            waitForEnd: true
+        }
+        onExited: {
+            const text = _colListCount.text;
+            listCountText.total = parseInt(text.trim()) || 0;
         }
     }
 
