@@ -28,8 +28,15 @@ Item {
     })
 
     onVisibleChanged: {
-        if (visible)
+        if (visible) {
             searchInput.forceActiveFocus();
+        } else {
+            // Don't reopen on a stale query: clear the search when the page
+            // hides (debounce stopped so no late write resurrects it).
+            searchDebounce.stop();
+            root.searchText = "";
+            searchInput.text = "";
+        }
     }
 
     Component.onCompleted: {
@@ -46,6 +53,15 @@ Item {
             return EmojiService.recentEmojis;
         }
         return EmojiService.allEmojis.filter(e => e && e.emoji && (e.category === root.currentCategory || (e.category && e.category.indexOf(root.currentCategory) >= 0))).slice(0, 600);
+    }
+
+    // Debounce search so the 1800-entry filter above doesn't re-run on every
+    // keystroke — only after the user pauses typing.
+    Timer {
+        id: searchDebounce
+        interval: 150
+        repeat: false
+        onTriggered: root.searchText = searchInput.text
     }
 
     Column {
@@ -84,8 +100,8 @@ Item {
                     font.pixelSize: 13
                     clip: true
                     onTextChanged: {
-                        root.searchText = text;
                         root.userActivity();
+                        searchDebounce.restart();
                     }
 
                     Keys.onEscapePressed: root.emojiPicked()

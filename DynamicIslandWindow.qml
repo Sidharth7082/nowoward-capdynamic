@@ -17,8 +17,22 @@ PanelWindow {
     property string page: "clock"   // "clock" | "player" | "stats" | "wifi" | "bluetooth" | "emojis"
     property var pages: ["clock", "player", "stats"]
 
+    // Called by the shell's adaptive-polling hub on every state change that
+    // affects which services need to poll (set from shell.qml).
+    property var activityReporter: null
+
+    function reportActivity() {
+        if (root.activityReporter)
+            root.activityReporter();
+    }
+
     readonly property int topMargin: 10
     readonly property int swipeThreshold: 40
+
+    // Finger-follow drag state: while dragging horizontally (or downward) the
+    // pageHost translates by these offsets; they spring back to 0 on release.
+    property real dragOffsetX: 0
+    property real dragOffsetY: 0
 
     property int idleTimeoutMs: 8000
 
@@ -51,6 +65,10 @@ PanelWindow {
             notifTimer.stop();
             volTimer.stop();
             wsTimer.stop();
+            dragSnapX.stop();
+            dragSnapY.stop();
+            root.dragOffsetX = 0;
+            root.dragOffsetY = 0;
             leaveTimer.stop();
             idleTimer.stop();
         }
@@ -69,6 +87,10 @@ PanelWindow {
             notifTimer.stop();
             volTimer.stop();
             wsTimer.stop();
+            dragSnapX.stop();
+            dragSnapY.stop();
+            root.dragOffsetX = 0;
+            root.dragOffsetY = 0;
             leaveTimer.stop();
             idleTimer.stop();
         }
@@ -90,12 +112,18 @@ PanelWindow {
         syncIdleTimer();
         if (expanded && page === "workspace")
             workspacePage.forceFocus();
+        root.reportActivity();
     }
     onPageChanged: {
         if (expanded && page === "workspace")
             workspacePage.forceFocus();
+        root.reportActivity();
     }
-    onPeekingChanged: syncIdleTimer()
+    onPeekingChanged: { syncIdleTimer(); root.reportActivity() }
+    onPeekingNotifChanged: root.reportActivity()
+    onPeekingVolumeChanged: root.reportActivity()
+    onPeekingWorkspaceChanged: root.reportActivity()
+    onVisibleChanged: root.reportActivity()
 
     function setExpanded(val) {
         expanded = val;
@@ -254,6 +282,8 @@ PanelWindow {
 
     IslandMprisController {
         id: mpris
+        // Only tick position/player while the music page is on screen.
+        active: root.expanded && root.page === "player"
     }
 
     // Auto-peek for MPRIS track changes
@@ -280,6 +310,7 @@ PanelWindow {
             : 1;
         root.wasPlayingBefore = mpris.playing;
         root._mediaReady = true;
+        root.reportActivity();
     }
 
     CompositorWorkspaceTracker {
@@ -331,6 +362,8 @@ PanelWindow {
                     && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peeking = true;
                 root.page = "player";
+                // Intentional: must NOT go through setExpanded(true), which
+                // clears peeking — this peek depends on it staying set.
                 root.expanded = true;
                 peekTimer.restart();
             }
@@ -346,6 +379,8 @@ PanelWindow {
                     && !root.suppressPeek && !root.hideForFullscreen) {
                 root.peeking = true;
                 root.page = "player";
+                // Intentional: must NOT go through setExpanded(true), which
+                // clears peeking — this peek depends on it staying set.
                 root.expanded = true;
                 peekTimer.restart();
             }
@@ -547,6 +582,26 @@ PanelWindow {
         }
     }
 
+    // Fixed-duration snap-back for the drag-follow parallax (bounded time —
+    // a spring here dragged on and felt laggy). Stopped on the next press so
+    // a new drag starts from a clean offset.
+    NumberAnimation {
+        id: dragSnapX
+        target: root
+        property: "dragOffsetX"
+        duration: 220
+        easing.type: Easing.OutCubic
+        to: 0
+    }
+    NumberAnimation {
+        id: dragSnapY
+        target: root
+        property: "dragOffsetY"
+        duration: 220
+        easing.type: Easing.OutCubic
+        to: 0
+    }
+
     Rectangle {
         id: capsule
 
@@ -560,7 +615,15 @@ PanelWindow {
         border.color: Theme.isMyGlass ? "#33ffffff" : "#50ffffff"
         border.width: 1
         clip: true
-        scale: gestureArea.containsPress ? 0.975 : (gestureArea.containsMouse ? 1.012 : 1.0)
+        // No antialiasing: it re-rasterized the whole clipped pill on every
+        // animation frame (costly, especially under software rendering), and
+        // it only mattered while scaling — which we removed.
+        // No hover/press scaling: scaling the whole capsule (with its text)
+        // made the words visibly shift every time the cursor crossed the pill
+        // edge. The pill's motion is limited to the deliberate size/position
+        // animations (expand, collapse, page switch) and the finger-follow
+        // drag.
+        scale: 1.0
         focus: root.expanded
         Keys.onPressed: function(event) {
             if (event.key === Qt.Key_Escape) {
@@ -586,20 +649,19 @@ PanelWindow {
             ColorAnimation { duration: 200 }
         }
 
-        Behavior on scale {
-            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-        }
-
+        // Bounded, snappy animations: springs (which settle by physics until
+        // within epsilon of the target) made expand/collapse/page-size changes
+        // drag on for a long time and feel slow. Fixed durations finish fast
+        // and predictably.
         Behavior on y {
-            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
         }
         Behavior on opacity {
             NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
         }
         Behavior on width {
-            // Gentler spring (overshoot 1.05 instead of 1.12) so the pill
-            // settles without the harsh snap on every page switch.
-            NumberAnimation { duration: 280; easing.type: Easing.OutBack; easing.overshoot: 1.05 }
+            // A hint of spring via overshoot, but time-bounded.
+            NumberAnimation { duration: 240; easing.type: Easing.OutBack; easing.overshoot: 1.08 }
         }
         Behavior on height {
             NumberAnimation { duration: 240; easing.type: Easing.OutCubic }
@@ -615,6 +677,7 @@ PanelWindow {
             hoverEnabled: true
 
             property real pressX: 0
+            property real pressY: 0
             property bool dragging: false
             // Which auto-peek was showing when the press started ("" if none):
             // a plain click converts that peek into its full page instead of
@@ -636,7 +699,14 @@ PanelWindow {
 
             onPressed: (mouse) => {
                 pressX = mouse.x;
+                pressY = mouse.y;
                 dragging = false;
+                // Start a new drag from a clean offset: stop any running
+                // snap-back spring and reset the parallax.
+                dragSnapX.stop();
+                dragSnapY.stop();
+                root.dragOffsetX = 0;
+                root.dragOffsetY = 0;
                 // Remember which auto-peek was showing so a plain click keeps
                 // the island open on that page instead of collapsing it.
                 wasPeeking = root.peeking ? "player"
@@ -665,21 +735,53 @@ PanelWindow {
                     root.notifyActivity();
             }
             onPositionChanged: (mouse) => {
-                if (Math.abs(mouse.x - pressX) > 6)
+                // With hoverEnabled, this handler also fires on plain hover
+                // (no button held) — and pressX/pressY are only set on press,
+                // so dx/dy would be garbage and the pages would follow the
+                // cursor without any click. Only track real drags.
+                if (mouse.buttons === 0)
+                    return;
+                const dx = mouse.x - pressX;
+                const dy = mouse.y - pressY;
+                // Deliberate-drag only: 12px so a normal click's micro-jitter
+                // never shifts the page content.
+                if (Math.abs(dx) > 12 || Math.abs(dy) > 12)
                     dragging = true;
+                // Finger-follow parallax: translate the page content with the
+                // drag (clamped tight); a downward drag tilts the page down so
+                // releasing past the threshold reads as a collapse gesture.
+                if (root.expanded && dragging) {
+                    root.dragOffsetX = Math.max(-40, Math.min(40, dx));
+                    root.dragOffsetY = dy > 0 ? Math.min(40, dy) : 0;
+                }
             }
             onReleased: (mouse) => {
                 const deltaX = mouse.x - pressX;
+                const deltaY = mouse.y - pressY;
+                // Swipe down (clearly dominant vertical motion) collapses.
+                const verticalSwipe = root.expanded && !root.peeking
+                    && deltaY > 50 && Math.abs(deltaY) > Math.abs(deltaX) * 1.5;
+
+                if (verticalSwipe) {
+                    root.setExpanded(false);
+                    dragSnapX.start();
+                    dragSnapY.start();
+                    return;
+                }
 
                 if (!root.expanded) {
-                    if (!dragging) {
-                        // Opening from a peek: land on the page that was
-                        // peeking (notif/volume/workspace peeks aren't
-                        // "expanded"), otherwise open the clock page.
-                        if (gestureArea.wasPeeking !== "")
-                            root.page = gestureArea.wasPeeking;
+                    // A press on an auto-peek converts it into its page even
+                    // if the press drifted a few px — don't let a sloppy drag
+                    // swallow the notification/volume/workspace peek.
+                    if (gestureArea.wasPeeking !== "") {
+                        root.page = gestureArea.wasPeeking;
+                        root.setExpanded(true);
+                    } else if (!dragging) {
+                        // Plain click on the collapsed pill opens the clock.
                         root.setExpanded(true);
                     }
+                    dragSnapX.start();
+                    dragSnapY.start();
                     return;
                 }
 
@@ -700,9 +802,22 @@ PanelWindow {
                 } else {
                     root.notifyActivity();
                 }
+                dragSnapX.start();
+                dragSnapY.start();
+            }
+            onCanceled: {
+                // Grab lost (compositor stole it / window hid mid-drag):
+                // spring the parallax back instead of leaving it shifted.
+                dragSnapX.start();
+                dragSnapY.start();
             }
             onWheel: (wheel) => {
-                if (root.expanded) {
+                // Only flip pages on the top-level pages (clock/player/stats).
+                // On wifi/bluetooth/emoji/cliphist/notifs/workspace the wheel
+                // must scroll their lists — otherwise a two-finger scroll
+                // silently switches pages (and nextPage() on a non-pages page
+                // jumps to "clock").
+                if (root.expanded && root.pages.indexOf(root.page) !== -1) {
                     if (wheel.angleDelta.y < 0 || wheel.angleDelta.x > 0)
                         root.nextPage();
                     else if (wheel.angleDelta.y > 0 || wheel.angleDelta.x < 0)
@@ -763,7 +878,12 @@ PanelWindow {
         // Expanded multi-page content
         Item {
             id: pageHost
-            anchors.fill: parent
+            // Explicit x/y/width/height (not anchors.fill) so the drag-follow
+            // parallax can translate the page content independently.
+            x: root.dragOffsetX
+            y: root.dragOffsetY
+            width: parent.width
+            height: parent.height
             opacity: (root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
             visible: opacity > 0.01
             enabled: root.expanded && opacity > 0.5
@@ -781,11 +901,11 @@ PanelWindow {
                 scale: root.page === "clock" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -812,11 +932,11 @@ PanelWindow {
                 scale: root.page === "player" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 3: System Stats / Control Center
@@ -829,11 +949,11 @@ PanelWindow {
 
                 onWifiRightClicked: root.showWifi()
                 onBtRightClicked: root.showBluetooth()
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 4: Notification History Center
@@ -844,11 +964,11 @@ PanelWindow {
                 scale: root.page === "notifs" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 6: Wi-Fi Detail Page
@@ -861,11 +981,11 @@ PanelWindow {
 
                 onBackClicked: root.showStats()
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 7: Bluetooth Detail Page
@@ -878,11 +998,11 @@ PanelWindow {
 
                 onBackClicked: root.showStats()
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 8: Logout / wlogout Page
@@ -896,11 +1016,11 @@ PanelWindow {
 
                 onActionTriggered: root.setExpanded(false)
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 9: Emoji Picker Page
@@ -914,11 +1034,11 @@ PanelWindow {
                 onEmojiPicked: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 10: Workspace Overview Page
@@ -933,11 +1053,11 @@ PanelWindow {
                 onWorkspaceSelected: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
 
             // Page 11: Cliphist Clipboard Manager Page
@@ -951,11 +1071,11 @@ PanelWindow {
                 onCloseRequested: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
-                // Pages cross-fade with a gentle ease; the capsule width spring
-                // carries the page-change motion, so content just needs a
-                // smooth dissolve instead of a fast snap.
-                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
-                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                // Pages dissolve in sync with the capsule spring: slightly
+                // longer than before so the fade isn't finished while the pill
+                // is still growing into its new page size.
+                Behavior on opacity { NumberAnimation { duration: 240; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
             }
         }
 

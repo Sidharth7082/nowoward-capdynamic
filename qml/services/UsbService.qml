@@ -6,8 +6,19 @@ QtObject {
     id: root
 
     property bool active: true
+    // Slowed by the shell when the island is fully collapsed; the plug/unplug
+    // notification tolerates the extra latency.
+    property int pollInterval: 2000
     property var knownDevices: ({})
     property bool initialized: false
+
+    // When the shell resumes polling after the island was hidden, re-baseline
+    // so devices plugged while polling was stopped don't fire stale
+    // notifications later.
+    onActiveChanged: {
+        if (root.active)
+            root.initialized = false
+    }
 
     property var _proc: Process {
         command: ["sh", "-c", "lsblk -o NAME,TRAN,RM,MODEL,SIZE,LABEL -J 2>/dev/null || echo '{\"blockdevices\":[]}'"]
@@ -25,7 +36,7 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 2000
+        interval: root.pollInterval
         running: root.active
         repeat: true
         triggeredOnStart: true

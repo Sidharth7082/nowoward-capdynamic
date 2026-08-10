@@ -6,6 +6,9 @@ QtObject {
     id: root
 
     property bool active: true
+    // Slowed by the shell when the island is fully collapsed; the charger
+    // notification tolerates the extra latency.
+    property int pollInterval: 2000
     property bool present: true
     property int percentage: 100
     property bool charging: false
@@ -13,6 +16,17 @@ QtObject {
 
     property bool _initialized: false
     property bool _prevPlugged: false
+    // Set when the shell resumes polling after the island was hidden; the next
+    // read re-establishes the baseline so a charge change that happened while
+    // polling was stopped doesn't fire a stale charger notification.
+    property bool _resumeBaseline: false
+
+    onActiveChanged: {
+        if (root.active) {
+            root._resumeBaseline = true;
+            root._initialized = false;
+        }
+    }
 
     onPluggedChanged: {
         if (!_initialized) {
@@ -52,7 +66,7 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 2000
+        interval: root.pollInterval
         running: root.active
         repeat: true
         triggeredOnStart: true
@@ -80,6 +94,14 @@ QtObject {
         } else {
             root.charging = false
             root.plugged = false
+        }
+        // If we just resumed polling, accept the current state as the baseline
+        // (covers the case where plugged didn't change, so onPluggedChanged
+        // never fired to re-baseline it).
+        if (root._resumeBaseline) {
+            root._resumeBaseline = false
+            root._initialized = true
+            root._prevPlugged = root.plugged
         }
     }
 }

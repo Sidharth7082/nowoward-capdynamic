@@ -9,6 +9,12 @@ QtObject {
     property bool muted: false
     signal volumeUpdated(int newVolume, bool isMuted)
 
+    // Gated by the shell's activity hub. Volume keeps polling while any island
+    // is mapped (the hardware-key peek depends on it); the interval slows
+    // while everything is collapsed.
+    property bool active: true
+    property int pollInterval: 2000
+
     property var _proc: Process {
         command: ["sh", "-c", "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null || echo 'Volume: 0.50'"]
         running: false
@@ -53,8 +59,8 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 2000
-        running: true
+        interval: root.pollInterval
+        running: root.active
         repeat: true
         triggeredOnStart: true
         onTriggered: {

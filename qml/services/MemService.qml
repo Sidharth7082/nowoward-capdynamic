@@ -6,6 +6,7 @@ QtObject {
     id: root
 
     property bool active: true
+    property int pollInterval: 2000
     property real usagePercent: 0.0
     property real totalMb: 0.0
     property real usedMb: 0.0
@@ -26,7 +27,7 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 2000
+        interval: root.pollInterval
         running: root.active
         repeat: true
         triggeredOnStart: true

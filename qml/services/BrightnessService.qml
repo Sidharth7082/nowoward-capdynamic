@@ -7,6 +7,11 @@ QtObject {
 
     property int brightness: 75
 
+    // Gated by the shell's activity hub: poll only while the control-center
+    // page is open.
+    property bool active: true
+    property int pollInterval: 3000
+
     property var _procGet: Process {
         command: ["sh", "-c", "brightnessctl -m 2>/dev/null || echo ',,75%'"]
         running: false
@@ -67,8 +72,8 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 3000
-        running: true
+        interval: root.pollInterval
+        running: root.active
         repeat: true
         triggeredOnStart: true
         onTriggered: {

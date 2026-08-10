@@ -9,6 +9,11 @@ QtObject {
     property string ssid: ""
     property var networkList: []
 
+    // Gated by the shell's activity hub: full scan on the wifi page, slow
+    // status poll while only the control-center tile is visible.
+    property bool active: true
+    property int pollInterval: 4000
+
     property var _procStatus: Process {
         command: ["sh", "-c", "nmcli radio wifi 2>/dev/null || echo 'enabled'"]
         running: false
@@ -163,8 +168,8 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 4000
-        running: true
+        interval: root.pollInterval
+        running: root.active
         repeat: true
         triggeredOnStart: true
         onTriggered: {

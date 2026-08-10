@@ -30,18 +30,31 @@ Everything is controllable from the terminal via `quickshell ipc`, from keyboard
 
 ## 🆕 What's New (latest build)
 
-**🐛 Bug fixes**
+**⚡ Performance**
+- **Adaptive service polling** — the shell only polls for data that's actually on screen: CPU/RAM/brightness only while the control-center page is open, Wi-Fi/Bluetooth only on their pages (with a slow status poll on the control-center tile), and volume/battery/USB slow down while the island is collapsed and stop entirely while it's hidden behind fullscreen. Idle background process spawns drop from ~4–5/s to under 1/s.
+- **Gated MPRIS ticking** — the per-monitor 1-second music position tick only runs while the player page is visible; track-change peeks still fire instantly.
+- **Debounced emoji search** — the 1800-emoji filter no longer re-runs on every keystroke.
+
+**✨ Smoother animation**
+- **Snappy, bounded animations** — the capsule's size, position, and corner radius morph with fast fixed-duration eases (200–240ms) that always finish on time; no physics springs that drag on and feel laggy.
+- **Swipe drag-follow** — pages follow your cursor while you drag and snap back with a spring; swipe **down** to collapse (only real press-and-drag moves content — hover is now fully static).
+- **Zero hover cost** — no hover/press scaling and no antialiasing on the capsule, so moving the mouse over the island costs nothing and words never shift.
+- Page transitions are retuned to dissolve in sync with the spring.
+
+**🐛 Bug fixes (this build)**
+- **Wheel scrolling no longer switches pages** — two-finger scroll on the Wi-Fi/Bluetooth/emoji/cliphist lists scrolls the list instead of teleporting to another page.
+- **No more phantom hover movement** — the pill no longer grows/shrinks on hover, and page content no longer follows the cursor; it only moves for real clicks/drags/swipes.
+- **Stale charger/USB notifications fixed** — plugging a charger while the island is hidden no longer fires "Charged" minutes later; both services re-baseline on resume.
+- **Peek survives sloppy drags** — a click that drifts a few pixels no longer swallows a notification/volume/workspace peek.
+
+**🐛 Bug fixes (previous build)**
 - **Workspace overview keyboard navigation** now works with more than 10 workspaces — `Enter`/`Space`/number keys select the correct workspace in the group currently on screen, and the selection highlight ring shows again.
 - **Music visualizer bars** now settle flat when paused (they used to freeze at random heights because the animation binding was overwritten).
 - After a **music peek auto-collapses**, the island re-opens on the clock page instead of the stale player page.
 - **Hyprland dispatches** (workspace focus, window move/close) now execute once instead of twice per call.
 - **Wallpaper picker** keeps your place in the carousel between opens, and thumbnail generation can no longer deadlock after a rescan.
 - **Deleting a clipboard entry** now plays its collapse animation (red flash → shrink → fade) instead of vanishing instantly.
-
-**✨ Smoother animation**
 - The **workspace-switch peek** now slides in from the correct side (the slide code was previously never driven).
-- Gentler capsule **spring physics** (reduced overshoot) and tuned durations, so page switches settle instead of snapping.
-- Pages **cross-fade more smoothly** during swipes.
 
 ---
 
@@ -213,7 +226,7 @@ bind = , XF86AudioPrev, global, nowoward-capdynamic:previous
 
 | Feature | Description |
 | :--- | :--- |
-| **🏝️ Capsule morphing** | Apple-style `OutBack` spring physics: the pill expands, collapses, scales, and rounds on interaction. |
+| **🏝️ Capsule morphing** | Apple-style pill: expands, collapses, and rounds with fast, snappy `OutBack`/`OutCubic` motion on interaction. |
 | **🕒 Clock & date page** | Tap the pill to expand into a minimal clock; swipe between pages. Auto-hides off-screen until the cursor touches the top edge. |
 | **🎵 MPRIS music player** | Full transport for Spotify, mpv, browsers, or any MPRIS player: album art, title/artist, draggable seek bar, shuffle/loop, next/prev/play-pause. Live animated frequency visualizer. Auto-peeks when a track starts. |
 | **⚙️ Control center** | Brightness & volume sliders (debounced — one process per drag, not per pixel), live CPU %, RAM %, battery % with animated fill bars. |

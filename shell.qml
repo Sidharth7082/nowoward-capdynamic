@@ -21,6 +21,60 @@ Scope {
     property var _btService: BluetoothService
     property var _usbService: UsbService
 
+    // ── Adaptive service polling hub ─────────────────────────────────
+    // Each island window calls updateActivity() (via its activityReporter
+    // callback) whenever its state changes. This hub aggregates state across
+    // all monitors and gates the polling services so they only spawn their
+    // processes while their data is actually on screen.
+    property bool islandVisible: false   // any island mapped (not fullscreen-hidden/suppressed)
+    property bool anythingOpen: false    // any island expanded or showing a peek
+    property bool statsActive: false     // control-center page open somewhere
+    property bool wifiActive: false
+    property bool btActive: false
+
+    function updateActivity() {
+        let vis = false, open = false, stats = false, wifi = false, bt = false;
+        const wins = panelVariants.instances ? panelVariants.instances : [];
+        for (let i = 0; i < wins.length; i++) {
+            const w = wins[i];
+            if (!w) continue;
+            if (w.visible) vis = true;
+            if (w.expanded || w.peeking || w.peekingNotif || w.peekingVolume || w.peekingWorkspace) open = true;
+            if (w.page === "stats") stats = true;
+            if (w.page === "wifi") wifi = true;
+            if (w.page === "bluetooth") bt = true;
+        }
+        islandVisible = vis;
+        anythingOpen = open;
+        statsActive = stats;
+        wifiActive = wifi;
+        btActive = bt;
+        applyActivity();
+    }
+
+    function applyActivity() {
+        // Page-only data: poll only while their page is open.
+        BrightnessService.active = statsActive;
+        CpuService.active = statsActive;
+        MemService.active = statsActive;
+
+        // Wi-Fi / Bluetooth: full scan on their page; while only the
+        // control-center tile is visible, fall back to a slow status poll.
+        NetworkService.active = wifiActive || statsActive;
+        NetworkService.pollInterval = wifiActive ? 4000 : 30000;
+        BluetoothService.active = btActive || statsActive;
+        BluetoothService.pollInterval = btActive ? 4000 : 30000;
+
+        // Peek/notification drivers: keep working whenever any island is
+        // mapped, but slow down while everything is collapsed.
+        VolumeService.active = islandVisible;
+        VolumeService.pollInterval = anythingOpen ? 2000 : 3000;
+        BatteryService.active = islandVisible;
+        BatteryService.pollInterval = anythingOpen ? 2000 : 5000;
+        UsbService.active = islandVisible;
+        UsbService.pollInterval = anythingOpen ? 2000 : 5000;
+    }
+
     function forEachWindow(callback) {
         const windows = panelVariants.instances ? panelVariants.instances : [];
         for (let index = 0; index < windows.length; index++) {
@@ -195,6 +249,7 @@ Scope {
             required property var modelData
 
             screen: modelData
+            activityReporter: shellRoot.updateActivity
         }
     }
 }

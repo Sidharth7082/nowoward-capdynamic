@@ -22,7 +22,7 @@
 ## 🟢 Basic Setup & General Questions
 
 ### Q1: What is `nowoward-capdynamic`?
-**A:** `nowoward-capdynamic` is an Apple-inspired **Dynamic Island & Cover-Flow Wallpaper Picker** built specifically for **Hyprland** using **Quickshell + QML**. It features smooth `OutBack` spring physics, live MPRIS audio visualizers, interactive Control Center cards, DBus notification popups, top-edge cursor sensors, and a standalone top WLogout panel.
+**A:** `nowoward-capdynamic` is an Apple-inspired **Dynamic Island & Cover-Flow Wallpaper Picker** built specifically for **Hyprland** using **Quickshell + QML**. It features snappy `OutBack`/`OutCubic` capsule morphing, live MPRIS audio visualizers, interactive Control Center cards, DBus notification popups, top-edge cursor sensors, and a standalone top WLogout panel.
 
 ### Q2: Will `nowoward-capdynamic` work without MyGlass?
 **A:** **YES! 100% standalone!**  

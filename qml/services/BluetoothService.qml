@@ -10,6 +10,11 @@ QtObject {
     property bool bluezInstalled: true
     property string statusText: "Checking..."
     property string hintText: "" // actionable message shown under the start button
+
+    // Gated by the shell's activity hub: full scan on the bluetooth page, slow
+    // status poll while only the control-center tile is visible.
+    property bool active: true
+    property int pollInterval: 4000
     property var deviceList: []
 
     // Reports one of: not_installed / service_inactive / yes / no
@@ -159,8 +164,8 @@ QtObject {
     }
 
     property var _timer: Timer {
-        interval: 4000
-        running: true
+        interval: root.pollInterval
+        running: root.active
         repeat: true
         triggeredOnStart: true
         onTriggered: {

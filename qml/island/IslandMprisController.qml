@@ -12,6 +12,12 @@ Item {
     property var activePlayer: null
     readonly property bool hasPlayer: activePlayer !== null
 
+    // The owning island window sets this: the 1-second position/player tick
+    // below only runs while the music page is actually on screen. Track-change
+    // peeks keep working regardless — they come from the live property
+    // bindings and the Mpris.players Connections, not from this timer.
+    property bool active: true
+
     // ---- metadata passthroughs ----
     readonly property string title: activePlayer ? (activePlayer.trackTitle || "") : ""
     readonly property string artist: activePlayer ? (activePlayer.trackArtist || "") : ""
@@ -183,9 +189,18 @@ Item {
 
     Timer {
         interval: 1000
-        running: true
+        running: root.active
         repeat: true
         onTriggered: {
+            root.refreshActivePlayer();
+            root._tick++;
+        }
+    }
+
+    // When the music page comes back on screen, refresh position/player state
+    // immediately instead of waiting up to a second for the next tick.
+    onActiveChanged: {
+        if (root.active) {
             root.refreshActivePlayer();
             root._tick++;
         }
