@@ -87,10 +87,12 @@ Item {
     signal closeRequested()
 
     focus: true
-    property int keyboardSelectedIndex: Math.max(0, Math.min(workspacesShown - 1, effectiveActiveWorkspaceId - 1))
+    // Index of the keyboard-selected cell *within the current group* (0..workspacesShown-1).
+    property int keyboardSelectedIndex: Math.max(0, Math.min(workspacesShown - 1,
+        effectiveActiveWorkspaceId - 1 - workspaceGroup * workspacesShown))
 
     function selectCurrentKeyboardWorkspace() {
-        const ws = keyboardSelectedIndex + 1;
+        const ws = workspaceGroup * workspacesShown + keyboardSelectedIndex + 1;
         hyprDispatch.focusWorkspace(ws);
         closeRequested();
     }
@@ -369,7 +371,8 @@ Item {
 
     onShowConditionChanged: {
         if (showCondition) {
-            keyboardSelectedIndex = Math.max(0, Math.min(workspacesShown - 1, effectiveActiveWorkspaceId - 1));
+            keyboardSelectedIndex = Math.max(0, Math.min(workspacesShown - 1,
+                effectiveActiveWorkspaceId - 1 - workspaceGroup * workspacesShown));
             forceActiveFocus();
             if (hyprlandData) hyprlandData.updateAll();
             scheduleRefresh();
@@ -448,7 +451,7 @@ Item {
                                 property bool atBottom: wsRow.index === root.rows-1
 
                                 property bool isFocusedWorkspace: wsValue === root.effectiveActiveWorkspaceId
-                                property bool isKeyboardSelected: wsValue === (root.keyboardSelectedIndex + 1)
+                                property bool isKeyboardSelected: wsValue === (root.workspaceGroup * root.workspacesShown + root.keyboardSelectedIndex + 1)
 
                                 implicitWidth: root.workspaceImplicitWidth
                                 implicitHeight: root.workspaceImplicitHeight

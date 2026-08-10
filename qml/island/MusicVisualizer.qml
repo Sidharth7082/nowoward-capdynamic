@@ -19,12 +19,17 @@ Row {
             id: bar
 
             readonly property int seed: index
+            // Random "level" driven by the bounce timer. Kept as a separate
+            // property so the height binding below is never overwritten: the
+            // old code did `bar.height = ...` in the timer, which destroys the
+            // binding and froze the bars at random heights when paused.
+            property real level: 0
             width: 4
             radius: 2
             color: root.barColor
             opacity: root.playing ? 0.95 : 0.45
             anchors.bottom: parent.bottom
-            height: root.playing ? 6 : 4
+            height: root.playing ? (5 + bar.level) : 4
 
             Behavior on height {
                 NumberAnimation { duration: 220; easing.type: Easing.InOutQuad }
@@ -37,7 +42,7 @@ Row {
                 interval: 260 + bar.seed * 70
                 running: root.playing
                 repeat: true
-                onTriggered: bar.height = 5 + Math.random() * 12
+                onTriggered: bar.level = Math.random() * 12
             }
         }
     }

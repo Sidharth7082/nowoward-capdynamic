@@ -65,9 +65,9 @@ Item {
     function deleteSelected() {
         if (filteredEntries.length === 0) return;
         // Ignore rapid re-presses while a delete is animating; otherwise the
-        // second keypress overwrites removeTimer.entryId and the first entry
+        // second keypress overwrites the pending entry id and the first entry
         // gets deleted from cliphist but never removed from the model.
-        if (holdRedTimer.running || removeTimer.running) return;
+        if (holdRedTimer.running || collapseTimer.running) return;
         let entry = filteredEntries[selectedIndex];
         root.deletingId = entry.id;
         Quickshell.execDetached(["sh", "-c", "printf '%s\\t' \"" + entry.id + "\" | cliphist delete"]);
@@ -89,22 +89,27 @@ Item {
         repeat: false
         onTriggered: {
             root.collapsingId = entryId;
-            removeTimer.entryId = entryId;
-            removeTimer.restart();
+            collapseTimer.entryId = entryId;
+            collapseTimer.restart();
         }
     }
 
+    // The entry stays in the model while it collapses (height 5 / opacity 0 /
+    // scale 0.75 via the delegate Behaviors). Only after the collapse plays do
+    // we filter it out — reassigning the JS-array model instantly destroys
+    // delegates, so collapsing and removal had to happen in the same step,
+    // which never showed the animation.
     Timer {
-        id: removeTimer
+        id: collapseTimer
         property string entryId: ""
-        interval: 220
+        interval: 200
         repeat: false
         onTriggered: {
-            let currentIdx = root.selectedIndex;
-            let savedContentY = listView.contentY;
             root.entries = root.entries.filter(e => e.id !== entryId);
             root.deletingId = "";
             root.collapsingId = "";
+            let currentIdx = root.selectedIndex;
+            let savedContentY = listView.contentY;
             let newLength = filteredEntries.length;
             if (newLength === 0) selectedIndex = -1;
             else if (currentIdx >= newLength) selectedIndex = newLength - 1;

@@ -79,7 +79,9 @@ QtObject {
     }
 
     function focusWorkspace(workspace) {
-        runHyprctl(["dispatch", "workspace", String(workspace)]);
+        // Single dispatch via the Quickshell event bus; dispatchExpression
+        // falls back to hyprctl when the dispatch throws. (The old code ran
+        // hyprctl AND the event dispatch, executing the action twice.)
         return dispatchExpression("hl.dsp.focus({ workspace = " + workspaceExpression(workspace) + " })");
     }
 
@@ -88,7 +90,6 @@ QtObject {
         if (selector === "")
             return false;
 
-        runHyprctl(["dispatch", "movetoworkspacesilent", String(workspace) + "," + selector]);
         return dispatchExpression("hl.dsp.window.move({ workspace = "
             + workspaceExpression(workspace)
             + ", follow = " + (follow ? "true" : "false")
@@ -101,7 +102,6 @@ QtObject {
         if (selector === "")
             return false;
 
-        runHyprctl(["dispatch", "movewindowpixel", "exact " + numberExpression(x) + " " + numberExpression(y) + "," + selector]);
         return dispatchExpression("hl.dsp.window.move({ x = "
             + numberExpression(x)
             + ", y = " + numberExpression(y)
@@ -115,7 +115,6 @@ QtObject {
         if (selector === "")
             return false;
 
-        runHyprctl(["dispatch", "focuswindow", selector]);
         return dispatchExpression("hl.dsp.focus({ window = " + luaString(selector) + " })");
     }
 
@@ -124,7 +123,6 @@ QtObject {
         if (selector === "")
             return false;
 
-        runHyprctl(["dispatch", "closewindow", selector]);
         return dispatchExpression("hl.dsp.window.close({ window = " + luaString(selector) + " })");
     }
 }

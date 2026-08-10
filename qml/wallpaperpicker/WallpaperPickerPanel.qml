@@ -150,6 +150,16 @@ Item {
         const idx = thumbQueue.shift();
         const item = wallpapers.get(idx);
 
+        // A rescan (wallpapers.clear()) may have invalidated this queued index.
+        // Without this guard the stale get() returned undefined and the
+        // item.filePath access below threw, leaving thumbBusy stuck true and
+        // killing all further thumbnail generation.
+        if (!item || item.thumbReady) {
+            thumbBusy = false;
+            pumpThumbQueue();
+            return;
+        }
+
         thumbProcess.targetIndex = idx;
         thumbProcess.command = [
             "ffmpeg",
@@ -269,7 +279,10 @@ Item {
                 id: carousel
                 anchors.fill: parent
                 anchors.margins: 14
-                model: root.shown ? wallpapers : null
+                // Keep the model bound at all times: nulling it on hide would
+                // destroy PathView state and reset the carousel to the first
+                // wallpaper on every open.
+                model: wallpapers
                 visible: wallpapers.count > 0
                 clip: false
 

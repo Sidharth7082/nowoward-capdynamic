@@ -391,7 +391,10 @@ PanelWindow {
         onTriggered: {
             if (root.peeking) {
                 root.peeking = false;
-                root.expanded = false;
+                // Route through setExpanded so the page resets to "clock"
+                // (directly setting expanded=false left page on "player" and
+                // the next click re-opened the music page unexpectedly).
+                root.setExpanded(false);
             }
         }
     }
@@ -584,23 +587,25 @@ PanelWindow {
         }
 
         Behavior on scale {
-            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
         }
 
         Behavior on y {
-            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
         }
         Behavior on opacity {
-            NumberAnimation { duration: 160; easing.type: Easing.OutQuad }
+            NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
         }
         Behavior on width {
-            NumberAnimation { duration: 220; easing.type: Easing.OutBack; easing.overshoot: 1.12 }
+            // Gentler spring (overshoot 1.05 instead of 1.12) so the pill
+            // settles without the harsh snap on every page switch.
+            NumberAnimation { duration: 280; easing.type: Easing.OutBack; easing.overshoot: 1.05 }
         }
         Behavior on height {
-            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 240; easing.type: Easing.OutCubic }
         }
         Behavior on radius {
-            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
         }
 
         MouseArea {
@@ -776,8 +781,11 @@ PanelWindow {
                 scale: root.page === "clock" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -804,8 +812,11 @@ PanelWindow {
                 scale: root.page === "player" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 3: System Stats / Control Center
@@ -818,8 +829,11 @@ PanelWindow {
 
                 onWifiRightClicked: root.showWifi()
                 onBtRightClicked: root.showBluetooth()
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 4: Notification History Center
@@ -830,8 +844,11 @@ PanelWindow {
                 scale: root.page === "notifs" ? 1 : 0.95
                 visible: opacity > 0.01
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 6: Wi-Fi Detail Page
@@ -844,8 +861,11 @@ PanelWindow {
 
                 onBackClicked: root.showStats()
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 7: Bluetooth Detail Page
@@ -858,8 +878,11 @@ PanelWindow {
 
                 onBackClicked: root.showStats()
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 8: Logout / wlogout Page
@@ -873,8 +896,11 @@ PanelWindow {
 
                 onActionTriggered: root.setExpanded(false)
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 9: Emoji Picker Page
@@ -888,8 +914,11 @@ PanelWindow {
                 onEmojiPicked: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 10: Workspace Overview Page
@@ -904,8 +933,11 @@ PanelWindow {
                 onWorkspaceSelected: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
 
             // Page 11: Cliphist Clipboard Manager Page
@@ -919,8 +951,11 @@ PanelWindow {
                 onCloseRequested: root.setExpanded(false)
                 onUserActivity: root.notifyActivity()
 
-                Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                // Pages cross-fade with a gentle ease; the capsule width spring
+                // carries the page-change motion, so content just needs a
+                // smooth dissolve instead of a fast snap.
+                Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.InOutQuad } }
+                Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
             }
         }
 

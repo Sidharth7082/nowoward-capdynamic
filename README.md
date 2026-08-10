@@ -28,6 +28,23 @@ Everything is controllable from the terminal via `quickshell ipc`, from keyboard
 
 ---
 
+## 🆕 What's New (latest build)
+
+**🐛 Bug fixes**
+- **Workspace overview keyboard navigation** now works with more than 10 workspaces — `Enter`/`Space`/number keys select the correct workspace in the group currently on screen, and the selection highlight ring shows again.
+- **Music visualizer bars** now settle flat when paused (they used to freeze at random heights because the animation binding was overwritten).
+- After a **music peek auto-collapses**, the island re-opens on the clock page instead of the stale player page.
+- **Hyprland dispatches** (workspace focus, window move/close) now execute once instead of twice per call.
+- **Wallpaper picker** keeps your place in the carousel between opens, and thumbnail generation can no longer deadlock after a rescan.
+- **Deleting a clipboard entry** now plays its collapse animation (red flash → shrink → fade) instead of vanishing instantly.
+
+**✨ Smoother animation**
+- The **workspace-switch peek** now slides in from the correct side (the slide code was previously never driven).
+- Gentler capsule **spring physics** (reduced overshoot) and tuned durations, so page switches settle instead of snapping.
+- Pages **cross-fade more smoothly** during swipes.
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Install the dependencies
@@ -206,7 +223,7 @@ bind = , XF86AudioPrev, global, nowoward-capdynamic:previous
 | **🔵 Bluetooth page** | Device scan, power toggle, and a smart start-button that detects whether BlueZ is missing, inactive, or running — with the exact command to fix it. |
 | **📋 Clipboard history** | `cliphist` integration: search, text & image previews, MIME-correct copy, delete with hold-to-confirm animation, keyboard navigation. |
 | **🎨 Emoji picker** | 1800+ Unicode 16.0 emojis with category tabs, live search, recent list, one-click `wl-copy`. |
-| **🖥️ Workspace overview** | 2×5 grid of workspaces 1–10 with wallpaper previews, mini app tiles, active-workspace highlight, number-key jumps, drag windows between workspaces. |
+| **🖥️ Workspace overview** | 2×5 grid with wallpaper previews and mini app tiles; auto-groups when you have more than 10 workspaces, active-workspace highlight, number-key jumps (works in any group), drag windows between workspaces. |
 | **🚪 Logout menu** | Lock / suspend / logout / reboot / shutdown — both in-island and as a GTK wlogout overlay. |
 | **🖼️ Cover-flow wallpaper picker** | Smooth PathView carousel with `ffmpeg`-generated thumbnail cache (loads instantly the second time), `awww` static + `mpvpaper` video backends. |
 | **🎯 Top-edge sensor** | The pill stays 100% hidden off-screen; touching the top edge of the monitor reveals it. |

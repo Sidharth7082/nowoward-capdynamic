@@ -20,6 +20,30 @@ Item {
     property real hiddenLeftPadding: 16
     property real hiddenRightPadding: 16
 
+    // The slide itself: whenever the direction changes, animate
+    // transitionProgress from ±1 (label fully off-screen on the incoming side)
+    // down to 0 (centered). The parent island only shows this layer while the
+    // peek is active, so the slide plays together with the fade-in.
+    NumberAnimation {
+        id: slideAnim
+        target: root
+        property: "transitionProgress"
+        duration: 320
+        easing.type: Easing.OutCubic
+    }
+
+    onSlideDirectionChanged: {
+        if (root.slideDirection === "none") {
+            slideAnim.stop();
+            root.transitionProgress = 0;
+        } else {
+            root.transitionProgress = root.slideDirection === "right" ? 1 : -1;
+            slideAnim.from = root.transitionProgress;
+            slideAnim.to = 0;
+            slideAnim.start();
+        }
+    }
+
     readonly property real clampedProgress: slideDirection === "right"
         ? Math.max(0, Math.min(1, transitionProgress))
         : (slideDirection === "left"
