@@ -253,7 +253,7 @@ Drive the shell from scripts, waybar/eww buttons, or your keybinds:
 | Action | Command |
 | :--- | :--- |
 | Toggle island | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island toggle` |
-| Show island | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island show` |
+| Show island | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island -- show` |
 | Hide island | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island hide` |
 | Clock page | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island clock` |
 | Music player page | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island player` |
@@ -268,9 +268,11 @@ Drive the shell from scripts, waybar/eww buttons, or your keybinds:
 | Emoji picker | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island emojis` |
 | Workspace overview | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call island workspace` |
 | Toggle wallpaper picker | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker toggle` |
-| Force show picker | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker show` |
+| Force show picker | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker -- show` |
 | Force hide picker | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call picker hide` |
 | Glass mode on / off / toggle | `quickshell ipc -p ~/.config/quickshell/nowoward-capdynamic call theme glassMode` / `defaultMode` / `toggle` |
+
+> **Note:** Quickshell 0.3.x parses `show` as an IPC subcommand, so the `show()` functions need a `--` separator: `call island -- show`, `call picker -- show`. `toggle` and `hide` do not need it.
 
 ---
 

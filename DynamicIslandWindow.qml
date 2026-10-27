@@ -112,6 +112,9 @@ PanelWindow {
         syncIdleTimer();
         if (expanded && page === "workspace")
             workspacePage.forceFocus();
+        if (root.expanded)
+            root.syncPageHostSize();
+        root.syncSurfaceHeight();
         root.reportActivity();
     }
     onPageChanged: {
@@ -223,6 +226,51 @@ PanelWindow {
                                                 ? Theme.btHeight
                                                 : (root.page === "logout" ? Theme.logoutHeight : Theme.clockHeight)))))))))))
 
+    // ── Smooth-morph plumbing ────────────────────────────────────────────
+    // The layer surface must not be resized on every animation frame: each
+    // Wayland resize reallocates buffers and reconfigures the layer, which
+    // makes the capsule morph stutter. Grow the surface immediately to the
+    // final page height, but only shrink it after the collapse animation has
+    // finished.
+    property int surfaceHeight: Theme.collapsedHeight
+
+    function syncSurfaceHeight() {
+        if (root.targetHeight >= root.surfaceHeight) {
+            surfaceShrinkTimer.stop();
+            root.surfaceHeight = root.targetHeight;
+        } else {
+            surfaceShrinkTimer.restart();
+        }
+    }
+
+    Timer {
+        id: surfaceShrinkTimer
+        interval: 260
+        repeat: false
+        onTriggered: root.surfaceHeight = root.targetHeight
+    }
+
+    // Pages are laid out at the current page's final size, not at the
+    // animating capsule size. Otherwise every morph frame re-lays out all ten
+    // page layers (text, grids, sliders), which is the other big source of
+    // jank. The size is only updated while expanded so the content fades out
+    // at its original size while the capsule shrinks around it.
+    property int pageHostWidth: Theme.clockWidth
+    property int pageHostHeight: Theme.clockHeight
+
+    function syncPageHostSize() {
+        if (!root.expanded)
+            return;
+        root.pageHostWidth = root.targetWidth;
+        root.pageHostHeight = root.targetHeight;
+    }
+
+    onTargetWidthChanged: root.syncPageHostSize()
+    onTargetHeightChanged: {
+        root.syncPageHostSize();
+        root.syncSurfaceHeight();
+    }
+
     color: "transparent"
     anchors { top: true; left: true; right: true }
 
@@ -237,7 +285,7 @@ PanelWindow {
     // window down 280px (and back up on close) — that reflow looked like the
     // island 'overlaying' windows and caused visible lag.
     exclusiveZone: 0
-    implicitHeight: root.topMargin + Math.ceil(capsule.height) + 8
+    implicitHeight: root.topMargin + root.surfaceHeight + 8
 
     Shortcut {
         sequence: "Escape"
@@ -245,11 +293,18 @@ PanelWindow {
         onActivated: root.setExpanded(false)
     }
 
+    // Keep the input region stable during a morph too. Letting it follow the
+    // animating capsule sends a new Wayland input region every frame; using the
+    // final size instead keeps it constant while the island grows.
+    readonly property real maskW: root.shouldHidePill
+        ? 260                                   // top-edge reveal target
+        : (root.expanded ? root.pageHostWidth : root.targetWidth)
+
     mask: Region {
-        x: Math.floor(capsule.x)
-        y: root.shouldHidePill ? 0 : Math.floor(capsule.y)
-        width: Math.ceil(capsule.width)
-        height: root.shouldHidePill ? 14 : Math.ceil(capsule.height)
+        x: Math.floor((root.width - maskW) / 2)
+        y: root.shouldHidePill ? 0 : root.topMargin
+        width: Math.ceil(maskW)
+        height: root.shouldHidePill ? 14 : Math.ceil(Math.max(capsule.height, root.surfaceHeight))
     }
 
     // Top edge hover trigger when pill is auto-hidden
@@ -310,6 +365,7 @@ PanelWindow {
             : 1;
         root.wasPlayingBefore = mpris.playing;
         root._mediaReady = true;
+        root.syncSurfaceHeight();
         root.reportActivity();
     }
 
@@ -879,11 +935,13 @@ PanelWindow {
         Item {
             id: pageHost
             // Explicit x/y/width/height (not anchors.fill) so the drag-follow
-            // parallax can translate the page content independently.
-            x: root.dragOffsetX
-            y: root.dragOffsetY
-            width: parent.width
-            height: parent.height
+            // parallax can translate the page content independently, and so
+            // the pages keep their final layout while the capsule morphs
+            // around them (see syncPageHostSize above).
+            x: Math.round((parent.width - width) / 2) + root.dragOffsetX
+            y: Math.round((parent.height - height) / 2) + root.dragOffsetY
+            width: root.pageHostWidth
+            height: root.pageHostHeight
             opacity: (root.expanded && !root.peekingNotif && !root.peekingVolume) ? 1 : 0
             visible: opacity > 0.01
             enabled: root.expanded && opacity > 0.5

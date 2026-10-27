@@ -18,6 +18,9 @@ Item {
         visible: root.shown
         color: "transparent"
         focusable: true
+        // Floating overlay: never reserve screen space, otherwise opening the
+        // bar pushes every tiled window down and shrinks it.
+        exclusiveZone: 0
 
         anchors { top: true; left: true; right: true }
         margins.top: 16

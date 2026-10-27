@@ -232,6 +232,9 @@ Item {
 
         color: "transparent"
         focusable: true
+        // Floating overlay: never reserve screen space, otherwise opening the
+        // picker pushes every tiled window down and shrinks it.
+        exclusiveZone: 0
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "nowoward-capdynamic-wallpaperpicker"

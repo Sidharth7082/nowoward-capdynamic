@@ -185,6 +185,8 @@ Item {
         visible: root.shown
         color: "transparent"
         focusable: true
+        // Floating overlay: never reserve screen space.
+        exclusiveZone: 0
 
         anchors { top: false; bottom: false; left: false; right: false }
         implicitWidth: 380
